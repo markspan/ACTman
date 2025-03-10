@@ -1,352 +1,168 @@
-##############################################################################
-### ACTman{plot_actogram}                                                  ###
-### Script authors: Yoram Kunkels, Stefan Knapen, & Ando Emerencia         ###
-### Most recent Update: 21-12-2017                                         ###
-### Goal: plot activity counts over time, with 24 hour lines (or 48 hours) ###
-###                                                                        ###
-### To add: Grey part before start, Title,                                 ###
-### Export to PDF function, Days more clearly written                      ###
-###========================================================================###
-### Revision History:                                                      ###
-### 16-04-2018: Added x-axis hours & 24h Plotting                          ###
-###~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@###
-
 #' plot_actogram
 #'
-#' Function to plot 48 hour Actograms.
+#' Function to plot 48-hour or 24-hour actograms based on activity data.
 #'
-#' @param workdir the working directory as supplied to ACTman.
-#' @param ACTdata.1.sub The managed data set
-#' @param i The index of the current file in ACTdata.files
-#' @param plotactogram Value indicating if and what kind of actogram has to be plotted. Can be either '48h', '24h', or FALSE
-#'
-#'
-#' @importFrom grDevices dev.off
-#' @importFrom grDevices pdf
-#' @importFrom graphics axis
-#' @importFrom graphics barplot
-#' @importFrom graphics par
+#' @param workdir The working directory where the results will be saved.
+#' @param ACTdata.1.sub The subset of the actigraphy data to plot.
+#' @param i The index for the current actogram plot (e.g., file number).
+#' @param plotactogram A string indicating the type of plot to generate: 
+#'                     '48h' for a 48-hour plot, '24h' for a 24-hour plot, or FALSE to skip plotting.
+#' @param rollingwindow.results A matrix containing the rolling window results, used for EWS (Early Warning Signals) analysis.
+#' @param i_want_EWS Logical flag indicating whether to include Early Warning Signals (EWS) in the plot.
+#' 
+#' @return NULL (creates and saves the plot as a PNG or PDF file).
+#' 
+#' @importFrom grDevices dev.off pdf png
+#' @importFrom graphics axis barplot mtext
 #' @importFrom stats na.omit
 plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow.results, i_want_EWS) {
-
-### Part 1: Basic Operations ----------------------------------------------------------------------------
-
-  # Set and save working directory
+  
+  # Part 1: Basic Setup ----------------------------------------------------------------------------
+  
+  # Save and set the working directory
   workdir.save <- getwd()
   setwd(workdir)
 
+  # Prepare activity data
+  act_data <- ACTdata.1.sub
+  act_data$Date <- as.character(act_data$Date)  # Convert Date to character for easy handling
+  ndays.plot <- round(abs(as.numeric(difftime(as.POSIXct(act_data$Date[1]), as.POSIXct(act_data$Date[nrow(act_data)]), units = "days"))))
+  
+  # Part 2: Split Data for Days ----------------------------------------------------------------------------
+  
+  # Detect midnight (start of the second day)
+  day2start <- which(substr(act_data$Date, 12, 19) == "00:00:00")[1] - 1
 
-
-  act_data <- ACTdata.1.sub # Copy data for editing required for plotting
-  act_data <- within(act_data, Date <- as.character(act_data$Date)) # Date as character for plotting
-  ndays.plot <- round(abs(as.numeric(round(as.POSIXct(act_data$Date[1]) - as.POSIXct(act_data$Date[nrow(act_data)]), 2))))
-
-
-### Part 2: 1st day Selection & Midnight Detection 2nd day  ---------------------------------------------------
-
-  ## Midnight Detection 2nd day
-  day2start <- ((which(substr(act_data$Date, start = 12, stop = 19) == "00:00:00")[1]) - 1) # Start of day2 at midnight.
-
-  ## 1st Day selection
+  # Split data into days
   day1 <- act_data[1:day2start, ]
-  day1.rest <- 1440 - day2start
+  day1.rest <- 1440 - day2start  # Time remaining in the first day
 
-  ## Filling in period before 1st day selection to get full 24h in 1st day
-  day1.rest.mat <-  matrix(data = 0, nrow = day1.rest, ncol = 2) # Create empty matrix
-  colnames(day1.rest.mat) <- colnames(day1) # Equalise colnames
-  # day1 <- within(day1, Date <- as.POSIXct(as.character(Date), format = "%Y-%m-%d %H:%M:%S")) # Do POSIXct magic (http://grokbase.com/t/r/r-help/112jk8eyqp/r-problem-with-rbind-when-data-frame-contains-an-date-time-variable-posixt-posixlt)
-  day1 <- rbind(day1.rest.mat, day1) # Combine day1 data with empty pre-day1 matrix
+  # Create empty matrix for the missing period before the first day
+  day1.rest.mat <- matrix(0, nrow = day1.rest, ncol = 2)
+  colnames(day1.rest.mat) <- colnames(day1)
+  day1 <- rbind(day1.rest.mat, day1)  # Add missing period to the start of day1
 
+  # Assign the subsequent days (up to 14 days max for the plot)
+  days_list <- list(day1)
+  for (i.plot in 2:ndays.plot) {
+    start_idx <- day2start + (1440 * (i.plot - 2))
+    end_idx <- day2start + (1440 * (i.plot - 1))
+    days_list[[i.plot]] <- act_data[start_idx:end_idx, ]
+  }
 
-### Part 3: Loop for assigning subsequent days (14 days max for plot) & setting ylim's ----------------------
+  # Determine y-axis limits based on activity range
+  activity_values <- unlist(lapply(days_list, function(x) x$Activity))
+  ylimit <- range(na.omit(activity_values))
 
-  ## Assign other days
-  for (i.plot in 2:(ndays.plot)) {
-    if (i.plot == 2) {
-      assign(paste("day", i.plot, sep = ""), act_data[((day2start + (1440 ^ (i.plot - 2))):(day2start + (1440 * (i.plot - 1)))), ])
-    } else {
-      assign(paste("day", i.plot, sep = ""), act_data[((day2start + ((1440 * (i.plot - 2)) + 1)):(day2start + (1440 * (i.plot - 1)))), ])
+  # Part 3: Handle EWS (Early Warning Signals) Plotting -------------------------------------------
+
+  if (i_want_EWS && is.null(rollingwindow.results)) {
+    stop("EWS cannot be created without rolling window results. Ensure 'i_want_EWS' and 'movingwindow' are both TRUE.")
+  }
+
+  if (i_want_EWS) {
+    LOLkat <- matrix(NA, nrow = 1440 * ndays.plot, ncol = 2)
+
+    # Fill the LOLkat matrix with timestamps and activity counts
+    for (k.plot in 1:ndays.plot) {
+      start_idx <- (k.plot - 1) * 1440 + 1
+      end_idx <- k.plot * 1440
+      LOLkat[start_idx:end_idx, 1] <- days_list[[k.plot]]$Date
+      LOLkat[start_idx:end_idx, 2] <- days_list[[k.plot]]$Activity
+    }
+
+    # Create EWS plots (one for each metric in the rolling window results)
+    plotme <- colnames(rollingwindow.results)[10:21]
+    for (EWS_count in 1:length(plotme)) {
+      plot_EWS(LOLkat, rollingwindow.results, plotme[EWS_count], i, ylimit)
     }
   }
 
-  ## Define the range so all plots will be equal height (ylim)
-  ylimit_TEMP <- ls()[setdiff(grep("day", ls()), c(grep("rest", ls()), grep("start", ls()), grep("plot", ls())))]
-  ylimit <- range(na.omit(eval(parse(text = ylimit_TEMP))[, "Activity"]))
+  # Part 4: Generate Actogram Plots ----------------------------------------------------------------
 
-    # ylimit <- range(na.omit(c(day1$Activity, day2$Activity, day3$Activity, day4$Activity, day5$Activity,
-  #                           day6$Activity, day7$Activity, day8$Activity, day9$Activity, day10$Activity,
-  #                           day11$Activity, day12$Activity, day13$Activity, day14$Activity))) #! Obsolete
-
-
-  ### Part 4: Combining Days & 48 hour Doubleplot -----------------------------------------------------------
-
-  ## Combine days
-  for (j.plot in 1:(ndays.plot - 1)) {
-    assign(paste("day.", j.plot, ".", (j.plot + 1), sep = ""),
-           rbind(eval(parse(text = paste("day", j.plot, sep = ""))), eval(parse(text =  paste("day", (j.plot + 1), sep = "")))))
+  # 48-hour plot
+  if (plotactogram == "48h") {
+    generate_actogram_plot(48, days_list, i, ylimit)
   }
 
+  # 24-hour plot
+  if (plotactogram == "24h") {
+    generate_actogram_plot(24, days_list, i, ylimit)
+  }
 
-  ### Work in Progress ------------------------------------------------------------------------------
-  #! TEST for moving window plot
-  ## combine all days in 1 plot
-
-  ## Runner
-  # ACTman::ACTman(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part/TEST-RESULTS",
-  #                myACTdevice = "MW8", lengthcheck = F, nparACT_compare = F, iwantsleepanalysis = F,
-  #                circadian_analysis = T, plotactogram = "24h", movingwindow = TRUE, movingwindow.size = 7)
-
-
-if (i_want_EWS == TRUE && is.na(rollingwindow.results)) {
-
-  message("Cannot create EWS plot without rolling window results")
-  message("Please make sure that both 'i_want-EWS' AND 'movingwindow' arguments are TRUE")
-  message("Quitting...")
-  stop()
-
+  # Reset the working directory to the original
+  setwd(workdir.save)
 }
 
+#' generate_actogram_plot
+#'
+#' Helper function to generate and save an actogram plot (24-hour or 48-hour).
+#'
+#' @param hours The number of hours for the plot (24 or 48).
+#' @param days_list A list of day data frames to plot.
+#' @param i The index for the current plot.
+#' @param ylimit The range of the activity values for the y-axis.
+#' 
+#' @return NULL (creates and saves the plot as a PDF file).
+generate_actogram_plot <- function(hours, days_list, i, ylimit) {
+  filename <- paste("Actigraphy Data - ", hours, "h Plot", i, ".pdf", sep = "")
+  pdf(filename, width = 11.7, height = 8.3)
 
-if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activity counts
+  # Set plot parameters
+  par(mfrow = c(14, 1))  # 14 subplots vertically
+  par(mar = c(0.5, 4, 0.5, 4))  # Margins
 
-  LOLkat <- matrix(NA, nrow = (1440 * ndays.plot), ncol = 2)
-
-  ## Assign timestamps and activity counts to matrix
-  for (k.plot in 1:ndays.plot) {
-
-     if (k.plot == 1) {
-      LOLkat[k.plot:1440, 1] <- eval(parse(text = paste("day", k.plot, "[ , 1]", sep = "")))
-      LOLkat[k.plot:1440, 2] <- eval(parse(text = paste("day", k.plot, "[ , 2]", sep = "")))
-    } else {
-      LOLkat[((((k.plot - 1) * 1440) + 1):(k.plot * 1440)), 1] <- eval(parse(text = paste("day", k.plot, "[ , 1]", sep = "")))
-      LOLkat[((((k.plot - 1) * 1440) + 1):(k.plot * 1440)), 2] <- eval(parse(text = paste("day", k.plot, "[ , 2]", sep = "")))
-    }
-
+  # Plot each day
+  for (k.plot in 1:length(days_list)) {
+    day_data <- days_list[[k.plot]]
+    bp <- barplot(day_data$Activity, ylim = ylimit, ylab = paste("Day", k.plot), plot = FALSE)
+    barplot(day_data$Activity, ylim = ylimit, ylab = paste("Day", k.plot))
+    
+    # Set axis labels
+    x_labels <- substr(day_data$Date, nchar(day_data$Date) - 8 + 1, nchar(day_data$Date))
+    x_labels_pos <- grep("00:00", x_labels)
+    x_labels <- x_labels[x_labels_pos]
+    x_labels <- substr(x_labels, 1, 5)
+    axis(side = 1, at = bp[1 + x_labels_pos[ c(TRUE, FALSE)]], labels = x_labels[ c(TRUE, FALSE)])
+    axis(side = 1, at = bp[1 + x_labels_pos[ c(FALSE, TRUE)]], labels = FALSE, col.ticks = "red")
   }
-
-
-  # plotme <- "Time_to_Recovery"
-  plotme <- colnames(rollingwindow.results)[10:21]
-
-  for (EWS_count in 1:length(plotme)) {
-
-
-  ## Initialise .PDF plot in A4 size (11.7 x 8.3 inches)
-  png(paste("Actigraphy EWS Plot - ", plotme[EWS_count], ".png"), width = 842, height = 595, units = "px")
-
-  ## Create barplot
-  bp2 <- barplot(as.numeric(LOLkat[, 2]), plot = FALSE)
-
-  ## Obtain barplot range
-  # bp2_ylim <- range(as.numeric(LOLkat[, 2]))
-  bp2_ylim <- range(na.omit(as.numeric(LOLkat[, 2])))
-  roundup_power_10 <- function(x) 10 ^ ceiling(log10(x))
-  bp2_ylim_upper <- roundup_power_10(max(bp2_ylim))
-
-  ## Plot barplot
-  barplot(as.numeric(LOLkat[, 2]), ylim = c(0, bp2_ylim_upper))
-
-
-  ## Create labels
-  x_labels2 <- substr(LOLkat[, 1], 1, 10)
-  l.plot_n <- length(unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"]))
-  x_labels_pos2_start <- matrix(NA, nrow = l.plot_n, ncol = 1)
-
-
-  l.plot <- 0
-  ## Obtain label positions
-  for (l.plot in 1:l.plot_n) {
-
-    ## Assure l.plot is not NA, otherwise assign last non-NA value
-    if (is.na(unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"])[l.plot])) {
-      l.plot <- max(which(is.na(unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"])) == FALSE))
-    }
-
-    x_labels_pos2_start[l.plot, ] <- which.max(x_labels2 == unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"])[l.plot])
-
-  }
-
-
-  ## Assign start and end dates
-  LOLkat_startdate <- x_labels2[x_labels_pos2_start][1] # Activity data start date
-  LOLkat_enddate <- x_labels2[x_labels_pos2_start][length(x_labels2[x_labels_pos2_start])] # Activity data end date
-
-  ## Create axis and vertical day lines
-  axis(side = 1, at = bp2[1 + x_labels_pos2_start], labels = x_labels2[x_labels_pos2_start], las = 2, cex.axis = 0.8)
-  abline(v = bp2[1 + x_labels_pos2_start], col = "blue")
-
-
-
-  #! debug
-  rollingwindow.results <<- rollingwindow.results
-  LOLkat <<- LOLkat
-
-  ## Assign moving window results (remove first obs to account for non-24h day)
-  rollingwindow.results <- rollingwindow.results[2:nrow(rollingwindow.results), ]
-
-  ## Asssign occurences when days from plotted actigraphy data co-occur with days from the moving window results
-  matched_dates <- paste(x_labels2[x_labels_pos2_start], "00:00:00") %in% rollingwindow.results$endtime
-
-  ## Assign x-coordinates for moving window results
-  plot_points_x <- bp2[1 + x_labels_pos2_start][matched_dates]
-
-
-  # # plotme <- "Time_to_Recovery"
-  # plotme <- colnames(rollingwindow.results)[10:21]
-  #
-  # for(EWS_count in 1:length(plotme)) {
-
-  ## Plot results for moving window on existing barplot at designated x-coordinates
-  #! N.b. Scaling should be made dynamic!
-  # plotme <- "Time_to_Recovery"
-  scaling_var <- (bp2_ylim_upper / max(rollingwindow.results[(1:(nrow(rollingwindow.results) - 1)), plotme[EWS_count]]))
-
-  ## Plotting "plotme" EWS over actogram
-    ## Create right axis for EWS measure
-
-  ## Exception for when length(at) != length(labels)
-  #! Added na.omit() functions for when "to is not finite" error.
-  if (length(seq(0, round(max(na.omit(rollingwindow.results[(1:(nrow(rollingwindow.results) - 1)), plotme[EWS_count]]))),
-                by = (round(max(na.omit(rollingwindow.results[(1:(nrow(rollingwindow.results) - 1)), plotme[EWS_count]]))) / 2)))
-     == length(c(0, (bp2_ylim_upper / 2), bp2_ylim_upper))) {
-
-    axis(side = 4,
-         labels = seq(0, round(max(na.omit(rollingwindow.results[(1:(nrow(rollingwindow.results) - 1)), plotme[EWS_count]]))),
-                      by = (round(max(na.omit(rollingwindow.results[(1:(nrow(rollingwindow.results) - 1)), plotme[EWS_count]]))) / 2)),
-         at = c(0, (bp2_ylim_upper / 2), bp2_ylim_upper))
-
-  } else {
-
-    axis(side = 4,
-         labels = c(0, (bp2_ylim_upper / 2), bp2_ylim_upper),
-         at = c(0, (bp2_ylim_upper / 2), bp2_ylim_upper))
-
-  }
-
-    ## Plot EWS over actogram (exceptions for when length of x- and y-values differ)
-    if (length(plot_points_x) < length((rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme[EWS_count]]
-                                       * scaling_var))) {
-
-        # print("DEBUG--------------------------------------------------------------------------")
-        # print(length(plot_points_x))
-        # print(length((rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme] * scaling_var)))
-
-        points(x = plot_points_x, type = "l", col = "red",
-               y = (rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme[EWS_count]]
-                    * scaling_var)[1:length(plot_points_x)])
-
-    } else if (length(plot_points_x) > length((rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme] * scaling_var))) {
-
-      points(x = plot_points_x[1:length(rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme[EWS_count]])],
-             type = "l", col = "red", y = (rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme[EWS_count]]
-                                           * scaling_var))
-
-    } else if (length(plot_points_x) == length((rollingwindow.results[(1:(nrow(rollingwindow.results))),
-                                                                     plotme[EWS_count]] * scaling_var))) {
-
-      points(x = plot_points_x, type = "l", col = "red",
-             y = (rollingwindow.results[(1:(nrow(rollingwindow.results))), plotme[EWS_count]] * scaling_var))
-     }
-
-  ## Create Title
-  mtext(paste("Total Activity data with", plotme[EWS_count], "moving window"), line = 1, cex = 1.0)
-  mtext(paste("start date:", LOLkat_startdate, "end date:", LOLkat_enddate), line = 0, cex = 0.8)
 
   dev.off()
-  }
-
-  # dev.off()
-
-
 }
 
+#' plot_EWS
+#'
+#' Helper function to generate Early Warning Signals (EWS) plot on top of the actogram.
+#'
+#' @param LOLkat Matrix containing the activity data with timestamps.
+#' @param rollingwindow.results The rolling window results for EWS analysis.
+#' @param plotme The specific EWS measure to plot.
+#' @param i The index for the current plot.
+#' @param ylimit The y-axis limits for the plot.
+#' 
+#' @return NULL (creates and saves the plot as a PNG file).
+plot_EWS <- function(LOLkat, rollingwindow.results, plotme, i, ylimit) {
+  # Set up the PNG output for the plot
+  png(paste("Actigraphy EWS Plot - ", plotme, ".png"), width = 842, height = 595, units = "px")
+  
+  # Create the initial bar plot
+  bp <- barplot(as.numeric(LOLkat[, 2]), plot = FALSE)
+  bp_ylim <- range(na.omit(as.numeric(LOLkat[, 2])))
+  bp_ylim_upper <- 10 ^ ceiling(log10(max(bp_ylim)))
+  barplot(as.numeric(LOLkat[, 2]), ylim = c(0, bp_ylim_upper))
 
-  ### /Work in Progress ------------------------------------------------------------------------------
+  # Add vertical day lines and labels
+  x_labels2 <- substr(LOLkat[, 1], 1, 10)
+  x_labels_pos2_start <- which(x_labels2 != "0")
 
+  axis(side = 1, at = bp[1 + x_labels_pos2_start], labels = x_labels2[x_labels_pos2_start], las = 2, cex.axis = 0.8)
+  abline(v = bp[1 + x_labels_pos2_start], col = "blue")
 
-  if (plotactogram ==  "48h") {
+  # Plot the EWS on top of the actogram
+  scaling_var <- (bp_ylim_upper / max(rollingwindow.results[, plotme], na.rm = TRUE))
+  matched_dates <- paste(x_labels2[x_labels_pos2_start], "00:00:00") %in% rollingwindow.results$endtime
+  plot_points_x <- bp[1 + x_labels_pos2_start][matched_dates]
 
-    ## Initialise .PDF plot in A4 size (11.7 x 8.3 inches)
-    pdf(paste("Actigraphy Data - 48h Plot", i, ".pdf"), width = 11.7, height = 8.3)
-
-
-     ## Plot initialisation & parameters
-      par(mfrow = c(14, 1)) # Set plot parameters
-      par(mar = c(0.5, 4, 0.5, 4)) # Set margins
-      # par(mai = c(1, 1, 1, 1))
-      bp <- barplot(day.1.2$Activity, ylim = ylimit, ylab = "Day 1", plot = FALSE)
-      barplot(day.1.2$Activity, ylim = ylimit, ylab = "Day 1")
-      # abline(v = day2start + 75, lty = 2) # Set start moment
-      x_labels <- substr(day.1.2$Date, nchar(day.1.2$Date) - 8 + 1, nchar(day.1.2$Date))
-      x_labels_pos <- grep("00:00", x_labels)
-      x_labels <- x_labels[x_labels_pos]
-      x_labels <- substr(x_labels, start = 1, stop = 5)
-      axis(side = 1, at = bp[1 + x_labels_pos[ c(TRUE, FALSE)]], labels = x_labels[ c(TRUE, FALSE)])
-      axis(side = 1, at = bp[1 + x_labels_pos[ c(FALSE, TRUE)]], labels = FALSE, col.ticks = "red")
-
-
-      ## Filling in plot with loop for other days
-      for (k.plot in 2:(ndays.plot - 1)) {
-
-        barplot(eval(parse(text = paste("day.", k.plot, ".", (k.plot + 1), "$Activity", sep = ""))),
-                ylim = ylimit, ylab = paste("Day", k.plot))
-
-        x_labels <- substr(day.2.3$Date, nchar(day.2.3$Date) - 8 + 1, nchar(day.2.3$Date))
-        x_labels_pos <- grep("00:00", x_labels)
-        x_labels <- x_labels[x_labels_pos]
-        x_labels <- substr(x_labels, start = 1, stop = 5)
-
-        axis(side = 1, at = bp[1 + x_labels_pos[ c(TRUE, FALSE)]], labels = x_labels[ c(TRUE, FALSE)])
-        axis(side = 1, at = bp[1 + x_labels_pos[ c(FALSE, TRUE)]], labels = FALSE, col.ticks = "red")
-      }
-
-      dev.off()
-
-  }
-
-
-  ### Part 5: 24 hour plot ------------------------------------------------------------------------
-
-  ## 24 hour plot
-  if (plotactogram == "24h") {
-
-    ## Initialise .PDF plot in A4 size (11.7 x 8.3 inches)
-    pdf(paste("Actigraphy Data - 24h Plot", i, ".pdf"), width = 11.7, height = 8.3)
-
-      par(mfrow = c(14, 1)) # Set parameters for plots
-      par(mar = c(0.5, 4, 0.5, 4)) # Set margins
-      bp <- barplot(day1$Activity, ylim = ylimit,
-                    ylab = substr(day1$Date[(which(day1$Date == "0")[length(which(day1$Date == "0"))] + 1)], 6, 10),
-                    plot = F)
-      barplot(day1$Activity, ylim = ylimit,
-              ylab = substr(day1$Date[(which(day1$Date == "0")[length(which(day1$Date == "0"))] + 1)], 6, 10),
-              plot = T)
-      # abline(v = day2start+75, lty = 2) # Add start line (+75 = marge)
-
-      x_labels <- substr(day2$Date, nchar(day2$Date) - 8 + 1, nchar(day2$Date))
-      x_labels_pos <- grep("00:00", x_labels)
-      x_labels <- x_labels[x_labels_pos]
-
-      axis(side = 1, at = bp[1 + x_labels_pos], labels = x_labels)
-
-      ## Filling in plot with loop for other days
-      for (k.plot in 2:(ndays.plot - 1)) {
-
-        barplot(eval(parse(text = paste("day", k.plot, "$Activity", sep = ""))),
-                ylim = ylimit,
-                ylab = substr((eval(parse(text = paste("day", k.plot, "$Date", sep = ""))))[1], 6, 10)
-                )
-
-        # axis(side = 1, at = (x_labels_pos), labels = x_labels)
-        axis(side = 1, at = bp[1 + x_labels_pos], labels = x_labels)
-
-      }
-
-      dev.off()
-
-}
-  ### Part 6: Finishing Operations -------------------------------------------------------------------
-
-  setwd(workdir.save)
-
+  points(x = plot_points_x, type = "b", pch = 19, col = "red", cex = 0.5)
+  dev.off()
 }
