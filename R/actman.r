@@ -32,6 +32,8 @@
 #' @param na_impute Boolean value indicating whether NA's should be imputed.
 #' @param missings_report Boolean value indicating whether missings promt should appear.
 #' @param lengthcheck Boolean value. If TRUE, the dataset is shortened to the start date plus 14 days, and observations more than 14 days after the start date are removed.
+#' @param on_high_missings What to do when more than 0.01% of a dataset's activity values are missing and `missings_report` is TRUE. One of `"continue"` (default; proceed with the analysis and note the situation) or `"abort"` (stop processing this dataset). Replaces the old interactive `readline()` prompt so batch/CI runs never hang.
+#' @param on_missing_markers What to do when the sleeplog derived from marker/button-press files has missing Bedtime/Gotup values. One of `"median"` (default; impute missing times with the median), `"manual"` (open an interactive editor via `fix()`; only usable in an interactive session), or `"abort"` (stop). Replaces the old interactive `readline()` prompt.
 #'
 #' @return if iwantsleepanalysis, this returns the sleepdata overview, else if movingwindow, it returns the moving window results, and otherwise it returns the actdata overview.
 #' @examples
@@ -59,7 +61,14 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
                    selectperiod = FALSE, startperiod = NULL, daysperiod = FALSE, endperiod = NULL,
                    movingwindow = FALSE, movingwindow.size = 14, movingwindow.jump = 1,
                    circadian_analysis = TRUE, nparACT_compare = FALSE, na_omit = FALSE, na_impute = FALSE,
-                   missings_report = TRUE, lengthcheck = TRUE, i_want_EWS = FALSE) {
+                   missings_report = TRUE, lengthcheck = TRUE, i_want_EWS = FALSE,
+                   on_high_missings = c("continue", "abort"),
+                   on_missing_markers = c("median", "manual", "abort")) {
+
+  ## Validate the non-interactive decision parameters up front (fail fast,
+  ## rather than partway through a long-running batch job).
+  on_high_missings <- match.arg(on_high_missings)
+  on_missing_markers <- match.arg(on_missing_markers)
 
   ## Step 1: Basic Operations-----------------------------------------------------------------
 
@@ -74,6 +83,10 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
   }
   if (any((grep(pattern = "markers", x = ACTdata.files)))) {
     ACTdata.files <- ACTdata.files[-(grep(pattern = "markers", x = ACTdata.files))] # Remove any markers files from data listing
+  }
+
+  if (length(ACTdata.files) == 0) {
+    stop(paste("No actigraphy .csv files found in workdir (after excluding sleeplog/markers files):", workdir))
   }
 
   ## Initialise overview:
@@ -108,7 +121,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
   ## Step 2: Main ACTman Loop------------------------------------------------------------------------
   ## Description: ...
 
-  for (i in 1:length(ACTdata.files)) {
+  for (i in seq_along(ACTdata.files)) {
 
     ## Test for user-defined arguments:
     if (myACTdevice != "MW8" && myACTdevice != "Actiwatch2") {
@@ -325,20 +338,12 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
         ## If so, explain situation to user via text prompt, and give them the choice to
         ## either continue or stop with the analyses.
         message("\nMore than 0.01% of data is missing!\nAnalysis results might deviate from true values!")
-        message("Do you want to continue?")
-        missings_prompt_answer <- readline(prompt = "Enter 'y' for Yes or 'n' for No:")
-        ## If user decides to stop the analyses, stop the analyses and report stop message.
-        if (missings_prompt_answer == "n") {
-          message("Stopped by user!")
-          ({break()})
-        }
-        ## If user decides to continue the analyses, continue and report continue message.
-        if (missings_prompt_answer == "y") {
-          print("Continue analysis with > 0.01% missings")
-          print("")
+        if (on_high_missings == "abort") {
+          message("on_high_missings = 'abort': stopping processing of this dataset.")
+          break()
         } else {
-          message("Unknown input!")
-          ({break()})
+          print("Continue analysis with > 0.01% missings (on_high_missings = 'continue')")
+          print("")
         }
       }
     }
@@ -575,7 +580,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     ## the whole period.
     if (iwantsleepanalysis) {
       # sleepdata.overview <- sleepdata_overview(workdir = sleepdatadir, actdata = ACTdata.1.sub, i = i, lengthcheck = lengthcheck)
-      sleepdata.overview <- sleepdata_overview(workdir = workdir, actdata = ACTdata.1.sub, i = i, lengthcheck = lengthcheck, ACTdata.files = ACTdata.files)
+      sleepdata.overview <- sleepdata_overview(workdir = workdir, actdata = ACTdata.1.sub, i = i, lengthcheck = lengthcheck, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
     }
 
     ## Actogram:

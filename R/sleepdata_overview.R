@@ -7,13 +7,16 @@
 #' @param i The index of the current file in ACTdata.files
 #' @param lengthcheck Boolean value. If TRUE, the dataset is shortened to the start date plus 14 days, and observations more than 14 days after the start date are removed.
 #' @param ACTdata.files The current file in ACTdata.files
+#' @param on_missing_markers What to do when the sleeplog generated from marker files has missing Bedtime/Gotup values. One of `"median"` (default), `"manual"`, or `"abort"`. See `?ACTman`. Only used when a sleeplog has to be generated from marker files.
 #'
 #' @return Returns a sleepdata overview.
 #'
 #' @importFrom stats na.omit
 #' @importFrom utils read.csv
 #' @importFrom utils write.csv
-sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files) {
+sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
+                               on_missing_markers = c("median", "manual", "abort")) {
+  on_missing_markers <- match.arg(on_missing_markers)
   # Voeg fragmentation index toe!
 
   ## Step 1: Basic Operations.----------------------------------------------------------------------------
@@ -67,7 +70,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files) 
     # # Run sleeplog_from_markers.R
     workdir <- getwd()
     # # debug(sleeplog_from_markers)
-    sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files)
+    sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
   }
 
 
@@ -118,7 +121,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files) 
       data.sleeplog <- read.csv(file = list.files(pattern = "sleeplog.csv")[which_ppns_sleeplog])
 
     } else {
-      sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files)
+      sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
 
       which_ppns_sleeplog <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
                                     list.files(pattern = "sleeplog.csv")) #sleeplog of this ppn
@@ -177,7 +180,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files) 
   ## LOOP for Calculating Sleep Variables
   #! Extended aa by 1440 min for sameday Bedtime Gotup (sometimes Bedtime is more in the future than
   #! old version supported - i.e. Bedtime falling outside aaa)
-  for (a in 1:loop_steps) {
+  for (a in seq_len(loop_steps)) {
 
     if (a == 1) {
       # aaa <- data[1:(end.night.1 + 1440), ] #! 17-4-18: was "aaa <- data[1:(end.night.1), ]" (!!)
@@ -409,7 +412,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files) 
     # Calculate sleep end:
     tempp <- aaa.sleeptime[which(head(aaa.sleeptime, n = (-4 * 60))$wakeup.chance <= 2), ]
     sleepend <- tail(tempp, n = 1) # sleepend = last element of temp
-    if (is.null(sleepend)) { # if we don't find anytyhing, use sleeplog got up time
+    if (nrow(sleepend) == 0) { # tail() of an empty data.frame returns 0 rows, not NULL; use sleeplog got up time instead
       sleepend <- aaa.sleeptime[rownr.Gotup, ]
     }
     sleep.end.ando <- sleepend$Time
@@ -432,10 +435,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files) 
     if (is.na(rownr.sleep.end) || (length(rownr.sleep.end) == 0)) {
 
       message("rownr.sleep.end is NA!")
-      message("Skipping current day!")
-      next()
-
-      #! Take sleep.end from sleeplog instead (!!)
+      message("Action: Taking sleep end from sleeplog Gotup time instead.")
       rownr.sleep.end <- rownr.Gotup
 
     }

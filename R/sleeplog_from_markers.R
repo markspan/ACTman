@@ -12,13 +12,16 @@
 #' @param workdir The directory where the sleep files are located.
 #' @param i The index of the current file in ACTdata.files
 #' @param ACTdata.files The current file in ACTdata.files
+#' @param on_missing_markers What to do when derived Bedtime/Gotup markers are missing. One of `"median"` (default; impute with the median time), `"manual"` (open an interactive editor via `fix()`; only usable in an interactive session), or `"abort"`.
 #'
 #' @return Returns a sleeplog
 #'
 #' @importFrom utils read.csv
 #' @importFrom utils write.csv
 #'
-sleeplog_from_markers <- function(workdir, i, ACTdata.files) {
+sleeplog_from_markers <- function(workdir, i, ACTdata.files,
+                                  on_missing_markers = c("median", "manual", "abort")) {
+  on_missing_markers <- match.arg(on_missing_markers)
 
   ## Set wd
   setwd(workdir)
@@ -253,13 +256,13 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files) {
   if (sum(is.na(sleeplog)) != 0) {
 
     message(paste("Warning:", sum(is.na(sleeplog)), "markers are missing!"))
+    message(paste("Resolving via on_missing_markers =", shQuote(on_missing_markers)))
 
-    message("How do you want to continue?")
-    missings_prompt_answer <- readline(prompt = "Enter 'm' to impute missing markers with median values,
-                                       'n' to impute missing markers with mean of nearest neighbours,
-                                       'f' to fill in the missings by hand, or 'q' to Abort:")
+    if (on_missing_markers == "abort") {
+      stop("on_missing_markers = 'abort': stopping due to missing markers.")
+    }
 
-    if (missings_prompt_answer == "m") {
+    if (on_missing_markers == "median") {
       message("Imputing missing markers using median!")
 
 
@@ -312,13 +315,13 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files) {
     #
     # }
 
-    if (missings_prompt_answer == "f") {
+    if (on_missing_markers == "manual") {
+      if (!interactive()) {
+        stop("on_missing_markers = 'manual' requires an interactive R session (fix() cannot run in a batch/CI job).")
+      }
       message("Please fill in the missing markers")
       message("Thereafter, click 'File > Close' to continu")
       fix(sleeplog)
-    }
-    if (missings_prompt_answer == "q") {
-      stop("User hit q to stop program.")
     }
 
     ## Check if sleeplog times end in ":00" insted of ":30" (otherwise "rownr.Gotup is NA!" Error)
