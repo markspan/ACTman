@@ -250,6 +250,12 @@ stacked vertically) as a 24-hour or 48-hour plot (`plotactogram = "24h"` or
 (`i_want_EWS = TRUE`, requires `movingwindow = TRUE` in the same `ACTman()`
 call so rolling-window results are available to plot against).
 
+Example output (`plotactogram = "24h"`, 10 days of synthetic activity data
+with a realistic circadian pattern plus noise, for illustration only --
+not real participant data):
+
+![Example 24h actogram: ten days of activity stacked one bar per day, showing a clear day/night rest-activity rhythm](man/figures/demo-actogram-24h.png)
+
 ## Package architecture
 
 The package is organized as small, mostly-single-responsibility modules.
