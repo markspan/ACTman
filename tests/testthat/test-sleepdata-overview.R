@@ -74,6 +74,40 @@ test_that("sleepdata_overview errors clearly when neither sleeplog nor markers f
   )
 })
 
+test_that("sleepdata_overview computes consistent assumed_sleep/actual_sleep_perc across nights for identical nightly patterns", {
+  ## Regression test for a bug where rownr.sleep.end was derived from
+  ## as.numeric(rownames(...)) instead of a which()-based position within
+  ## `aaa`. Row names are inherited from the full multi-night dataset and
+  ## only happen to equal the in-window position for the first night, so
+  ## every subsequent night's assumed_sleep/actual_sleep_perc/
+  ## actual_wake_perc were silently corrupted (e.g. "29 hours" of assumed
+  ## sleep in a single night) while sleep.efficiency/timeinbed stayed
+  ## correct via an unrelated safety-net branch -- which is exactly why it
+  ## went unnoticed. With two nights of *identical* activity patterns,
+  ## every metric should come out identical too.
+  fixture_dir <- withr::local_tempdir()
+  fx <- make_sleep_fixture(fixture_dir)
+  withr::local_dir(fx$dir)
+
+  result <- sleepdata_overview(workdir = fx$dir, actdata = fx$actdata, i = 1,
+                               lengthcheck = FALSE, ACTdata.files = "P01.csv")
+
+  expect_equal(nrow(result), 2)
+  assumed_sleep <- suppressWarnings(as.numeric(result$assumed_sleep))
+  actual_sleep_perc <- suppressWarnings(as.numeric(result$actual_sleep_perc))
+  actual_wake_perc <- suppressWarnings(as.numeric(result$actual_wake_perc))
+
+  expect_equal(assumed_sleep[1], assumed_sleep[2], tolerance = 1e-6)
+  expect_equal(actual_sleep_perc[1], actual_sleep_perc[2], tolerance = 1e-6)
+  expect_equal(actual_wake_perc[1], actual_wake_perc[2], tolerance = 1e-6)
+
+  ## And they should be plausible values, not (e.g.) 29 hours of sleep or a
+  ## negative/over-100 percentage.
+  expect_true(all(assumed_sleep > 0 & assumed_sleep < 24))
+  expect_true(all(actual_sleep_perc >= 0 & actual_sleep_perc <= 100))
+  expect_true(all(actual_wake_perc >= 0 & actual_wake_perc <= 100))
+})
+
 test_that("sleepdata_overview rejects an invalid on_missing_markers value", {
   fixture_dir <- withr::local_tempdir()
   fx <- make_sleep_fixture(fixture_dir)

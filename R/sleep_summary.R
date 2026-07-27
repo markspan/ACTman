@@ -261,35 +261,41 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
       next()
     }
 
-    ## Get sleeptime
-    aaa.sleeptime <- aaa[rownr.sleep.start:(rownr.Gotup + (4 * 60)), ] # A (4 * 60) minute extra window is included, for when a subject filled the diary incorrectly (with a too early time). This makes sure that if sleep actually ended after the Gotup time the sleep end is somewhere near the Gotup, instead of in the middle of the night.
+    ## Window from sleep onset to just past Gotup, in which to look for
+    ## sleep offset. A (4 * 60) minute extra margin past Gotup is included,
+    ## for when a subject filled the diary incorrectly (with a too-early
+    ## Gotup time): this makes sure that if sleep actually ended after the
+    ## diary's Gotup time, sleep offset is still found near Gotup, instead
+    ## of the search window ending in the middle of the night.
+    post_bedtime_window <- aaa[rownr.sleep.start:(rownr.Gotup + (4 * 60)), ]
 
-    ## First candidate approach: find sustained wake periods via wakeup.chance,
-    ## then take the point where the gap between candidates exceeds 4 minutes
-    ## (i.e. skip small blips, keep the first genuinely sustained wake period).
-    sleep.end. <- aaa.sleeptime[which(aaa.sleeptime$wakeup.chance >= 2 & dplyr::lead(aaa.sleeptime$wakeup.chance > 2)), ]
-    sleep.end.$diff[2:nrow(sleep.end.)] <- diff(as.numeric(row.names(sleep.end.)))
-    sleep.end.new <- sleep.end.[which(sleep.end.$diff > 4), ] # Bigger than 4, as the difference should be at least 5 minutes, so a small difference with possible sleep is left out.
+    ## Sleep offset = the last epoch before Gotup with a low enough
+    ## wakeup.chance (i.e. the last "quiet" epoch before the sustained
+    ## waking-up period). head(..., n = -4*60) excludes the trailing 4-hour
+    ## margin added above, so a quiet epoch found only in that margin
+    ## doesn't count as sleep offset itself.
+    quiet_epochs_before_gotup <- post_bedtime_window[which(head(post_bedtime_window, n = (-4 * 60))$wakeup.chance <= 2), ]
+    last_quiet_epoch <- tail(quiet_epochs_before_gotup, n = 1)
 
-    if (sum(na.omit(sleep.end.$diff > 4)) == 0) {
-      sleep.end.new <- sleep.end.[1, ]
+    if (nrow(last_quiet_epoch) == 0) {
+      ## No epoch in the window qualified as "quiet" -- tail() of an empty
+      ## data frame returns 0 rows, not NULL. Fall back to Gotup itself.
+      ## NOTE: Gotup's position (rownr.Gotup) is relative to aaa, so it must
+      ## be re-expressed relative to post_bedtime_window's own indexing
+      ## (which starts at rownr.sleep.start within aaa), not used directly.
+      last_quiet_epoch <- post_bedtime_window[rownr.Gotup - rownr.sleep.start + 1, ]
     }
 
-    sleep.end.row <- as.numeric(rownames(sleep.end.new[nrow(sleep.end.new), ]))
-    sleep.end <- as.character(aaa$Time[ifelse(sleep.end.row > rownr.Gotup, rownr.Gotup, sleep.end.row)])
-    rownr.sleep.end <- ifelse(sleep.end.row > rownr.Gotup, rownr.Gotup, sleep.end.row)
+    sleep.end <- last_quiet_epoch$Time
 
-    ## Second (currently authoritative) approach: last epoch before Gotup
-    ## with a low enough wakeup.chance marks sleep offset. Overwrites the
-    ## first approach's result above.
-    tempp <- aaa.sleeptime[which(head(aaa.sleeptime, n = (-4 * 60))$wakeup.chance <= 2), ]
-    sleepend <- tail(tempp, n = 1) # sleepend = last element of temp
-    if (nrow(sleepend) == 0) { # tail() of an empty data.frame returns 0 rows, not NULL; use sleeplog got up time instead
-      sleepend <- aaa.sleeptime[rownr.Gotup, ]
-    }
-
-    sleep.end <- sleepend$Time
-    rownr.sleep.end <- as.numeric(rownames(sleepend))
+    ## Sleep offset's position within aaa. Deliberately re-derived via
+    ## which() (consistent with every other rownr.* in this function) rather
+    ## than as.numeric(rownames(last_quiet_epoch)): row names are inherited
+    ## from the original full dataset and only happen to equal the position
+    ## within aaa for the very first night, silently corrupting downstream
+    ## duration calculations (assumed_sleep, actual_sleep_perc,
+    ## actual_wake_perc) for every subsequent night. See NEWS.md.
+    rownr.sleep.end <- which(aaa$Time == sleep.end)[1]
 
     ## Exception for when rownr.sleep.end is NA
     if (is.na(rownr.sleep.end) || (length(rownr.sleep.end) == 0)) {
@@ -307,7 +313,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
     if (nrow(aaa.assumedsleeptime) > 1440) {
 
       message("nrow assumedsleeptime > 1440!!!!!!!!")
-      aaa.assumedsleeptime <- aaa[(which(aaa$Time == Bedtime)[1]:which(aaa$Time == sleepend$Time)[1]), ]
+      aaa.assumedsleeptime <- aaa[(which(aaa$Time == Bedtime)[1]:which(aaa$Time == last_quiet_epoch$Time)[1]), ]
 
     }
 

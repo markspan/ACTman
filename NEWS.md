@@ -1,5 +1,55 @@
 # ACTman (development)
 
+## Phase 6: fix silent per-night sleep-metric corruption (rowname/position bug)
+
+Verified against the full test suite (56/56 assertions green, up from 49).
+
+### Fixed
+- `sleepdata_overview()`: `rownr.sleep.end` was computed as
+  `as.numeric(rownames(sleepend))`, while every other position in this
+  function (`rownr.Bedtime`, `rownr.Gotup`, `rownr.sleep.start`, ...) is
+  computed via `which(aaa$Time == ...)`. Row names are inherited from the
+  full multi-night `data` object and only coincide with the in-window
+  position within `aaa` for the *first* night (since night 1's window
+  starts at row 1 of `data`); for every subsequent night, `aaa` starts
+  partway through `data`, so the row name is an unrelated, much larger
+  absolute row number. This silently corrupted `assumed_sleep`,
+  `actual_sleep_perc`, and `actual_wake_perc` for every night after the
+  first (confirmed directly: a synthetic 2-night fixture with identical
+  nightly activity patterns produced `assumed_sleep = 8.00` for night 1 but
+  `29.03` for night 2). `sleep.efficiency`, `timeinbed`, `sleep.start`,
+  `sleep.end`, `sleep.latency`, `actual_sleep_duration`, and
+  `wakepochs_duration` were unaffected -- they're derived from a separate
+  `aaa.assumedsleeptime` recomputation that an existing `nrow(...) > 1440`
+  safety-net branch already corrected, which is almost certainly why this
+  went unnoticed: the headline metric (sleep efficiency) was fine, and the
+  corrupted columns are secondary. Fixed by deriving `rownr.sleep.end` via
+  `which()`, consistent with every other position in the function.
+- Same fix's root-cause analysis also surfaced a related, narrower bug: the
+  fallback when no epoch qualifies as "quiet" before Gotup
+  (`post_bedtime_window[rownr.Gotup, ]`) indexed a position from `aaa`'s
+  index space into `post_bedtime_window`, a different (shifted) subset --
+  wrong whenever that position happened to still be in range. Fixed by
+  re-expressing the index relative to `post_bedtime_window`'s own start
+  (`rownr.Gotup - rownr.sleep.start + 1`).
+- Removed a "first approach" sleep-offset calculation
+  (`sleep.end.`/`sleep.end.new`/`sleep.end.row`) that was computed and then
+  *unconditionally overwritten* by a second approach -- pure dead code that
+  also carried its own latent bug risk (a `2:nrow(x)` assignment that could
+  error on a 0- or 1-row intermediate result).
+
+### Readability
+- Renamed the variables directly involved in the above
+  (`aaa.sleeptime`/`tempp`/`sleepend` -> `post_bedtime_window`/
+  `quiet_epochs_before_gotup`/`last_quiet_epoch`) and added comments
+  explaining the index-space distinction that caused both bugs.
+
+### Added
+- `test-sleepdata-overview.R`: a regression test asserting
+  `assumed_sleep`/`actual_sleep_perc`/`actual_wake_perc` are identical
+  across two nights with identical activity patterns, and fall within
+  plausible ranges (this is what would have caught the bug above).
+
 ## Phase 5: readability pass (dead code, docstrings, two bugs found by new tests)
 
 Verified against the full test suite (49/49 assertions green, up from 46;
