@@ -1,0 +1,2 @@
+"filename","start","end","end2","numberofobs","numberofobs2","recordingtime","recordingtime2","summertime.start","summertime.end","missings","missings_perc","IS","IV","RA","L5","L5_starttime","M10","M10_starttime","last5act.active","lengthcheck"
+"P01.csv","2016-01-01","2016-01-16 23:59:00","2016-01-15",23040,20161,16,14,NA,NA,66,0.003,0.98,0.15,0.25,39.68,"00:13:00",65.69,"08:07:00",NA,TRUE
