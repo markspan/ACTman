@@ -1,5 +1,34 @@
 # ACTman (development)
 
+## Phase 3: modular file split + full manual
+
+No behavior change (verified against all characterization/unit tests at
+every step). Purely structural + documentation:
+
+- Split `nparcalc.R` into `circadian_metrics.R` (IS/IV/RA/L5/M10),
+  `ews_metrics.R` (Mean/Variance/SD/CoV/Skewness/Kurtosis/Autocorrelation/
+  Time-to-Recovery), and a thin `nparcalc.R` wrapper that handles
+  device/window detection and delegates to the two. Both new functions are
+  pure (no I/O, no printing, no `setwd()`).
+- Extracted `score_epochs()` (`sleep_scoring.R`) from `sleepdata_overview()`:
+  the per-epoch wake/sleep/mobile classification and sleep-chance/
+  wakeup-chance rolling indicators, now a standalone pure function.
+- Extracted `run_rolling_window()` (`rolling_window.R`) from `ACTman()`'s
+  previously-inline moving-window closure.
+- Renamed files for consistency: `actman.r` -> `actman.R`,
+  `plot_actogram.R` -> `actogram.R`, `sleeplog_from_markers.R` ->
+  `sleeplog.R`, `sleepdata_overview.R` -> `sleep_summary.R`.
+- Added `utils.R` for shared constants (`MINUTES_PER_DAY`,
+  `L5_WINDOW_MINUTES`, `M10_WINDOW_MINUTES`, `MAX_AUTOCORR_LAG`).
+- Added test coverage for `run_rolling_window()` (previously the
+  moving-window path had zero test coverage).
+- Rewrote `README.md` as a full manual: installation, data format specs for
+  both supported devices, worked examples for every major workflow, a
+  package architecture map, a function-by-function reference, and the
+  scientific references the calculations are based on (Van Someren et al.
+  1999; Witting et al. 1990; Cole et al. 1992; Scheffer et al. 2009; Van de
+  Leemput et al. 2014).
+
 ## Phase 2: bug fixes and non-interactive operation
 
 Baseline: `compsy/ACTman@66d8f69`.

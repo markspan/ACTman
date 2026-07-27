@@ -193,18 +193,9 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
     aaa$Date <- as.POSIXct(aaa$Date)
 
-    ## Formula to create a score value per epoch
-    aaa <- dplyr::mutate(aaa, score = (
-      (dplyr::lag(Activity..MW.counts., n = 1L, default = 0) / 5) +
-        (dplyr::lag(Activity..MW.counts., n = 2L, default = 0) / 25) +
-        (dplyr::lead(Activity..MW.counts., n = 1L, default = 0) / 5) +
-        (dplyr::lead(Activity..MW.counts., n = 2L, default = 0) / 25) +
-        Activity..MW.counts.))
-
-    ## Calculate whether score indicates awake or not
-    ## NOTE: 40 is 'Medium Sensitivity', 20 is 'High Sensitivity'
-    aaa$WakeSleep <- ifelse(aaa$score > 20, 1, 0) # 1 is awake, 0 is sleep
-    aaa$MobileImmobile <- ifelse(aaa$Activity..MW.counts. > 3, 1, 0) # 1 is mobile, 0 is immobile
+    ## Epoch-level wake/sleep scoring (score, WakeSleep, MobileImmobile,
+    ## epoch.sleep.chance, sleep.chance, wakeup.chance); see ?score_epochs.
+    aaa <- score_epochs(aaa)
 
     ## Now calculate sleep start from a certain point in the data (based on sleep log)
     Bedtime <- paste((as.character(data.sleeplog$Bedtime[a])), ":00", sep = "")
@@ -267,21 +258,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
 
     ## Calculation should indicate the moment of sleep start and 10 consecutive non-active epochs. 1 epoch can have activity.
-
-    ## Dit gedeelte aanpassen a.d.h.v. MW8 Info Bullitin
-    ## !!Open Question: Where is Number of Counts Allowed above Threshold specified?? (6 seems arbitrary?)
-    aaa$epoch.sleep.chance <- ifelse(aaa$Activity..MW.counts. > 6, 1, 0) # 1 is above treshold, 0 is below treshold
-    aaa$sleep.chance <- (dplyr::lead(aaa$epoch.sleep.chance, n = 1L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 2L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 3L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 4L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 5L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 6L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 7L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 8L) +
-                           dplyr::lead(aaa$epoch.sleep.chance, n = 9L) +
-                           aaa$epoch.sleep.chance
-    )
+    ## (epoch.sleep.chance / sleep.chance already computed above by score_epochs())
 
 
     ##--------------------------------------------------
@@ -330,13 +307,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
       rownr.sleep.start <- which(aaa$Time == sleep.start)[1]
     }
 
-    ## Calculate wake up time
-    aaa$wakeup.chance <- (dplyr::lag(aaa$epoch.sleep.chance, n = 1L) +
-                            dplyr::lag(aaa$epoch.sleep.chance, n = 2L) +
-                            dplyr::lag(aaa$epoch.sleep.chance, n = 3L) +
-                            dplyr::lag(aaa$epoch.sleep.chance, n = 4L) +
-                            aaa$epoch.sleep.chance
-    )
+    ## (wakeup.chance already computed above by score_epochs())
 
 
     # ##--------------------------------------------------

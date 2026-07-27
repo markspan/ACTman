@@ -417,97 +417,12 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     #! Add Sleep-analysis for Rolling Window!
     #! Add possibility to change 'jump-length' of rolling window (now 1 day) to multiple days!
     if (movingwindow) {
-      rollingwindow <- function(x, window, jump) {
-        ## Initialise parameters:
-        out <- data.frame()
-        n <- nrow(x)
-        rollingwindow.results <- as.data.frame(matrix(nrow = (floor(((n - window) / jump))), ncol = 21))
-        ## Set number of iterations at number of rows of (data - windowsize) / (minutes per day (1440) * jump)
-        for (i in 1:((floor(((n - window) / jump))) + 1)) {
-          ## Take data as 1 till windowsize for first iteration, for further iterations take
-          ## data as starting at ((iteration - 1) * (minutes per day * jump)), and ending at
-          ## ((iteration - 1) * (minutes per day * jump)) plus windowsize.
-          if (i == 1) {
-            out <- x[i:window, ]
-          } else {
-            out <- x[((i - 1) * jump):(((i - 1) * jump) + window), ]
-          }
-          ## Write selected period to dataset (CRV.data) and add relevant column names:
-          CRV.data <- out
-          if (ncol(CRV.data) > 2) {
-            colnames(CRV.data) <- c("Date", "Time", "Activity")
-          } else if (ncol(CRV.data) == 2) {
-            colnames(CRV.data) <- c("Date", "Activity")
-          }
-
-          ## Use the nparcalc{ACTman} function to calculate circadian rhythm variables over
-          ## the selected period within the window. Write results to rollingwindow.results.
-          r2 <- nparcalc(myACTdevice = myACTdevice, movingwindow = movingwindow, CRV.data = CRV.data, ACTdata.1.sub = ACTdata.1.sub, out = out)
-          rollingwindow.results[i, 1] <- as.character(strftime(CRV.data[1, "Date"], format = "%Y-%m-%d %H:%M:%S"))
-          rollingwindow.results[i, 2] <- as.character(strftime(CRV.data[nrow(CRV.data), "Date"], format = "%Y-%m-%d %H:%M:%S"))
-          rollingwindow.results[i, 3] <- r2$IS
-          rollingwindow.results[i, 4] <- r2$IV
-          rollingwindow.results[i, 5] <- round(r2$RA, 2)
-          rollingwindow.results[i, 6] <- round(r2$L5, 2)
-          rollingwindow.results[i, 7] <- r2$L5_starttime
-          rollingwindow.results[i, 8] <- round(r2$M10, 2)
-          rollingwindow.results[i, 9] <- r2$M10_starttime
-          rollingwindow.results[i, 10] <- r2$Mean
-          rollingwindow.results[i, 11] <- r2$Variance
-          rollingwindow.results[i, 12] <- r2$SD
-          rollingwindow.results[i, 13] <- r2$CoV
-          rollingwindow.results[i, 14] <- r2$Skewness
-          rollingwindow.results[i, 15] <- r2$Kurtosis
-          rollingwindow.results[i, 16] <- r2$Autocorr
-          rollingwindow.results[i, 17] <- r2$Autocorr_lag2
-          rollingwindow.results[i, 18] <- r2$Autocorr_lag3
-          rollingwindow.results[i, 19] <- r2$Autocorr_lag60
-          rollingwindow.results[i, 20] <- r2$Autocorr_lag120
-          rollingwindow.results[i, 21] <- r2$Time_to_Recovery
-          colnames(rollingwindow.results) <- c("starttime", "endtime", "IS", "IV", "RA", "L5", "L5_starttime",
-                                               "M10", "M10_starttime", "Mean", "Variance", "SD",
-                                               "Coeff_of_Var", "Skewness", "Kurtosis", "Autocorr_lag1",
-                                               "Autocorr_lag2", "Autocorr_lag3", "Autocorr_lag60",
-                                               "Autocorr_lag120", "Time_to_Recovery")
-
-          ## Report the calculated circadian results in console:
-          print("---------------------------------------------------------------------------------")
-          print(paste("Rolling window CRV analysis output - Window step:", (i - 1)))
-          print(paste("Begin time:", CRV.data[1, "Date"]))
-          print(paste("End time:", CRV.data[nrow(CRV.data), "Date"]))
-          print(paste("nOBS:", nrow(CRV.data)))
-          print("")
-          print("Circadian Rhythm Variables")
-          print(paste("IS: ", r2$IS))
-          print(paste("IV: ", r2$IV))
-          print(paste("RA: ", round(r2$RA, 2)))
-          print(paste("L5: ", round(r2$L5, 2)))
-          print(paste("L5_starttime: ", r2$L5_starttime))
-          print(paste("M10: ", round(r2$M10, 2)))
-          print(paste("M10_starttime: ", r2$M10_starttime))
-          print("")
-          print("Early-Warning Signals")
-          print(paste("Mean: ", r2$Mean))
-          print(paste("Variance: ", r2$Variance))
-          print(paste("SD: ", r2$SD))
-          print(paste("Coefficient of Variation: ", r2$CoV))
-          print(paste("Skewness: ", r2$Skewness))
-          print(paste("Kurtosis: ", r2$Kurtosis))
-          print(paste("Autocorr at-lag-1: ", r2$Autocorr))
-          print(paste("Autocorr at-lag-2: ", r2$Autocorr_lag2))
-          print(paste("Autocorr at-lag-3: ", r2$Autocorr_lag3))
-          print(paste("Autocorr at-lag-60: ", r2$Autocorr_lag60))
-          print(paste("Autocorr at-lag-120: ", r2$Autocorr_lag120))
-          print(paste("Time_to_Recovery: ", r2$Time_to_Recovery))
-          print("---------------------------------------------------------------------------------")
-
-        }
-        rollingwindow.results # Needed for output in .CSV
-
-        rollingwindow.results <- rollingwindow.results
-      }
-      ## Assign results from rolling window:
-      rollingwindow.results <- rollingwindow(x = CRV.data, window = (1440 * (movingwindow.size)), jump = (1440 * (movingwindow.jump)))
+      ## Assign results from rolling window (see ?run_rolling_window):
+      rollingwindow.results <- run_rolling_window(x = CRV.data,
+                                                  window = (1440 * (movingwindow.size)),
+                                                  jump = (1440 * (movingwindow.jump)),
+                                                  myACTdevice = myACTdevice,
+                                                  ACTdata.1.sub = ACTdata.1.sub)
 
       ## Initialise normal circadian rhythm analysis without moving window:
     } else {
