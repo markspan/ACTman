@@ -37,7 +37,12 @@ plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow
 
 
   act_data <- ACTdata.1.sub # Copy data for editing required for plotting
-  act_data <- within(act_data, Date <- as.character(act_data$Date)) # Date as character for plotting
+  ## Use format() with an explicit format string rather than as.character():
+  ## as.character() on a POSIXct silently drops the time-of-day when it is
+  ## exactly midnight (e.g. "2020-01-01 00:00:00" prints as "2020-01-01"),
+  ## which breaks the substr(Date, 12, 19) == "00:00:00" day-boundary checks
+  ## below whenever the very first recorded minute happens to be midnight.
+  act_data <- within(act_data, Date <- format(act_data$Date, "%Y-%m-%d %H:%M:%S"))
   ndays.plot <- round(abs(as.numeric(round(as.POSIXct(act_data$Date[1]) - as.POSIXct(act_data$Date[nrow(act_data)]), 2))))
 
 
@@ -53,7 +58,6 @@ plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow
   ## Filling in period before 1st day selection to get full 24h in 1st day
   day1.rest.mat <-  matrix(data = 0, nrow = day1.rest, ncol = 2) # Create empty matrix
   colnames(day1.rest.mat) <- colnames(day1) # Equalise colnames
-  # day1 <- within(day1, Date <- as.POSIXct(as.character(Date), format = "%Y-%m-%d %H:%M:%S")) # Do POSIXct magic (http://grokbase.com/t/r/r-help/112jk8eyqp/r-problem-with-rbind-when-data-frame-contains-an-date-time-variable-posixt-posixlt)
   day1 <- rbind(day1.rest.mat, day1) # Combine day1 data with empty pre-day1 matrix
 
 
@@ -72,10 +76,6 @@ plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow
   ylimit_TEMP <- ls()[setdiff(grep("day", ls()), c(grep("rest", ls()), grep("start", ls()), grep("plot", ls())))]
   ylimit <- range(na.omit(eval(parse(text = ylimit_TEMP))[, "Activity"]))
 
-    # ylimit <- range(na.omit(c(day1$Activity, day2$Activity, day3$Activity, day4$Activity, day5$Activity,
-  #                           day6$Activity, day7$Activity, day8$Activity, day9$Activity, day10$Activity,
-  #                           day11$Activity, day12$Activity, day13$Activity, day14$Activity))) #! Obsolete
-
 
   ### Part 4: Combining Days & 48 hour Doubleplot -----------------------------------------------------------
 
@@ -86,45 +86,31 @@ plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow
   }
 
 
-  ### Work in Progress ------------------------------------------------------------------------------
-  #! TEST for moving window plot
-  ## combine all days in 1 plot
-
-  ## Runner
-  # ACTman::ACTman(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part/TEST-RESULTS",
-  #                myACTdevice = "MW8", lengthcheck = F, nparACT_compare = F, iwantsleepanalysis = F,
-  #                circadian_analysis = T, plotactogram = "24h", movingwindow = TRUE, movingwindow.size = 7)
-
-
 if (i_want_EWS == TRUE && is.na(rollingwindow.results)) {
 
-  message("Cannot create EWS plot without rolling window results")
-  message("Please make sure that both 'i_want-EWS' AND 'movingwindow' arguments are TRUE")
-  message("Quitting...")
-  stop()
+  stop("Cannot create EWS plot without rolling window results. Ensure 'i_want_EWS' and 'movingwindow' are both TRUE.")
 
 }
 
 
 if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activity counts
 
-  LOLkat <- matrix(NA, nrow = (1440 * ndays.plot), ncol = 2)
+  ews_timeseries <- matrix(NA, nrow = (1440 * ndays.plot), ncol = 2)
 
   ## Assign timestamps and activity counts to matrix
   for (k.plot in 1:ndays.plot) {
 
      if (k.plot == 1) {
-      LOLkat[k.plot:1440, 1] <- eval(parse(text = paste("day", k.plot, "[ , 1]", sep = "")))
-      LOLkat[k.plot:1440, 2] <- eval(parse(text = paste("day", k.plot, "[ , 2]", sep = "")))
+      ews_timeseries[k.plot:1440, 1] <- eval(parse(text = paste("day", k.plot, "[ , 1]", sep = "")))
+      ews_timeseries[k.plot:1440, 2] <- eval(parse(text = paste("day", k.plot, "[ , 2]", sep = "")))
     } else {
-      LOLkat[((((k.plot - 1) * 1440) + 1):(k.plot * 1440)), 1] <- eval(parse(text = paste("day", k.plot, "[ , 1]", sep = "")))
-      LOLkat[((((k.plot - 1) * 1440) + 1):(k.plot * 1440)), 2] <- eval(parse(text = paste("day", k.plot, "[ , 2]", sep = "")))
+      ews_timeseries[((((k.plot - 1) * 1440) + 1):(k.plot * 1440)), 1] <- eval(parse(text = paste("day", k.plot, "[ , 1]", sep = "")))
+      ews_timeseries[((((k.plot - 1) * 1440) + 1):(k.plot * 1440)), 2] <- eval(parse(text = paste("day", k.plot, "[ , 2]", sep = "")))
     }
 
   }
 
 
-  # plotme <- "Time_to_Recovery"
   plotme <- colnames(rollingwindow.results)[10:21]
 
   for (EWS_count in 1:length(plotme)) {
@@ -134,21 +120,19 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
   png(file.path(paths$actogram_dir, paste("Actigraphy EWS Plot - ", plotme[EWS_count], ".png")), width = 842, height = 595, units = "px")
 
   ## Create barplot
-  bp2 <- barplot(as.numeric(LOLkat[, 2]), plot = FALSE)
+  bp2 <- barplot(as.numeric(ews_timeseries[, 2]), plot = FALSE)
 
   ## Obtain barplot range
-  # bp2_ylim <- range(as.numeric(LOLkat[, 2]))
-  bp2_ylim <- range(na.omit(as.numeric(LOLkat[, 2])))
-  roundup_power_10 <- function(x) 10 ^ ceiling(log10(x))
+  bp2_ylim <- range(na.omit(as.numeric(ews_timeseries[, 2])))
   bp2_ylim_upper <- roundup_power_10(max(bp2_ylim))
 
   ## Plot barplot
-  barplot(as.numeric(LOLkat[, 2]), ylim = c(0, bp2_ylim_upper))
+  barplot(as.numeric(ews_timeseries[, 2]), ylim = c(0, bp2_ylim_upper))
 
 
   ## Create labels
-  x_labels2 <- substr(LOLkat[, 1], 1, 10)
-  l.plot_n <- length(unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"]))
+  x_labels2 <- substr(ews_timeseries[, 1], 1, 10)
+  l.plot_n <- length(unique(substr(ews_timeseries[, 1], 1, 10)[!substr(ews_timeseries[, 1], 1, 10) == "0"]))
   x_labels_pos2_start <- matrix(NA, nrow = l.plot_n, ncol = 1)
 
 
@@ -157,28 +141,22 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
   for (l.plot in 1:l.plot_n) {
 
     ## Assure l.plot is not NA, otherwise assign last non-NA value
-    if (is.na(unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"])[l.plot])) {
-      l.plot <- max(which(is.na(unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"])) == FALSE))
+    if (is.na(unique(substr(ews_timeseries[, 1], 1, 10)[!substr(ews_timeseries[, 1], 1, 10) == "0"])[l.plot])) {
+      l.plot <- max(which(is.na(unique(substr(ews_timeseries[, 1], 1, 10)[!substr(ews_timeseries[, 1], 1, 10) == "0"])) == FALSE))
     }
 
-    x_labels_pos2_start[l.plot, ] <- which.max(x_labels2 == unique(substr(LOLkat[, 1], 1, 10)[!substr(LOLkat[, 1], 1, 10) == "0"])[l.plot])
+    x_labels_pos2_start[l.plot, ] <- which.max(x_labels2 == unique(substr(ews_timeseries[, 1], 1, 10)[!substr(ews_timeseries[, 1], 1, 10) == "0"])[l.plot])
 
   }
 
 
   ## Assign start and end dates
-  LOLkat_startdate <- x_labels2[x_labels_pos2_start][1] # Activity data start date
-  LOLkat_enddate <- x_labels2[x_labels_pos2_start][length(x_labels2[x_labels_pos2_start])] # Activity data end date
+  ews_timeseries_startdate <- x_labels2[x_labels_pos2_start][1] # Activity data start date
+  ews_timeseries_enddate <- x_labels2[x_labels_pos2_start][length(x_labels2[x_labels_pos2_start])] # Activity data end date
 
   ## Create axis and vertical day lines
   axis(side = 1, at = bp2[1 + x_labels_pos2_start], labels = x_labels2[x_labels_pos2_start], las = 2, cex.axis = 0.8)
   abline(v = bp2[1 + x_labels_pos2_start], col = "blue")
-
-
-
-  #! debug
-  rollingwindow.results <<- rollingwindow.results
-  LOLkat <<- LOLkat
 
   ## Assign moving window results (remove first obs to account for non-24h day)
   rollingwindow.results <- rollingwindow.results[2:nrow(rollingwindow.results), ]
@@ -190,14 +168,11 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
   plot_points_x <- bp2[1 + x_labels_pos2_start][matched_dates]
 
 
-  # # plotme <- "Time_to_Recovery"
-  # plotme <- colnames(rollingwindow.results)[10:21]
   #
   # for(EWS_count in 1:length(plotme)) {
 
   ## Plot results for moving window on existing barplot at designated x-coordinates
   #! N.b. Scaling should be made dynamic!
-  # plotme <- "Time_to_Recovery"
   scaling_var <- (bp2_ylim_upper / max(rollingwindow.results[(1:(nrow(rollingwindow.results) - 1)), plotme[EWS_count]]))
 
   ## Plotting "plotme" EWS over actogram
@@ -249,7 +224,7 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
 
   ## Create Title
   mtext(paste("Total Activity data with", plotme[EWS_count], "moving window"), line = 1, cex = 1.0)
-  mtext(paste("start date:", LOLkat_startdate, "end date:", LOLkat_enddate), line = 0, cex = 0.8)
+  mtext(paste("start date:", ews_timeseries_startdate, "end date:", ews_timeseries_enddate), line = 0, cex = 0.8)
 
   dev.off()
   }

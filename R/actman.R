@@ -193,7 +193,6 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
         }
         ACTdata.TEMP$C <- as.numeric(ACTdata.TEMP$C) + halfminute_data
         # #! Workaround for aforementioned issue
-        # ACTdata.TEMP <- ACTdata.TEMP[ - which(grepl("00:30", ACTdata.TEMP$B)), ]
 
         ## Write binned data in ACTdata.TEMP to workable data object ACTdata.1.sub:
         ACTdata.1.sub <- ACTdata.TEMP
@@ -354,7 +353,6 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
     # ## Set NA to 0
     # #! Debug and/or possible future functionality if required
-    # ACTdata.1.sub[is.na(ACTdata.1.sub)] <- 0
 
 
     ## Check if there is activity in the tail of the dataset. As sometimes at the end of the study
@@ -472,7 +470,6 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     ## Use the sleepdata_overview{ACTman} function to calculate sleep variables over
     ## the whole period.
     if (iwantsleepanalysis) {
-      # sleepdata.overview <- sleepdata_overview(workdir = sleepdatadir, actdata = ACTdata.1.sub, i = i, lengthcheck = lengthcheck)
       sleepdata.overview <- sleepdata_overview(workdir = workdir, actdata = ACTdata.1.sub, i = i, lengthcheck = lengthcheck, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
     }
 
@@ -513,7 +510,6 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
   ## Subset experimental variables
   ACTdata.1.sub.expvars <- ACTdata.overview[c("IS", "IV", "RA", "L5", "L5_starttime", "M10", "M10_starttime")]
-  # colnames(ACTdata.1.sub.expvars) <- c("IS", "IV", "RA", "L5", "L5 Start time", "M10", "M10 Start time")
 
 
   ## Write results of circadian analysis and overview to .CSV
