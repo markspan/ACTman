@@ -21,23 +21,20 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
   ## Step 1: Basic Operations.----------------------------------------------------------------------------
 
-  # # Set Working directory
-  # oldworkdir <- getwd()
-  # setwd(workdir)
-
-  # print(ACTdata.files)
+  ## Absolute-path structure, replacing the previous approach of relying on
+  ## whatever setwd() the caller (ACTman()) had done before calling this
+  ## function.
+  paths <- actman_paths(workdir)
 
   # Load data
   data <- actdata
-  # TEMPdat <<- data
   data.sleeplog <- NA
 
-  # data$Activity..MW.counts. <- as.numeric(as.character(data$Activity..MW.counts.)) #Use when data <- ACTdata.1 !!!
   data$Activity..MW.counts. <- as.numeric(as.character(data$Activity))
 
   ## Read sleeplog
-  if (length(list.files(pattern = "sleeplog.csv")) == 0 &&
-     length(list.files(pattern = "markers.csv")) == 0) { # Sanity Check
+  if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) == 0 &&
+     length(list.files(paths$workdir, pattern = "markers.csv")) == 0) { # Sanity Check
     message("No sleeplog or Event marker file found in working directory!")
     message("Please provide sleeplog or Event marker file!")
     message("Also please make sure that the name of the sleeplog file ends in 'sleeplog.csv'!")
@@ -48,86 +45,62 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
 
   # When only sleeplog found
-  if (length(list.files(pattern = "sleeplog.csv")) >= 1 &&
-     length(list.files(pattern = "markers.csv")) == 0) { # Check for Marker file
+  if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) >= 1 &&
+     length(list.files(paths$workdir, pattern = "markers.csv")) == 0) { # Check for Marker file
     message("Sleeplog file found in working directory!")
 
-
-    data.sleeplog <- read.csv(file = list.files(pattern = "sleeplog.csv")[i], sep = "\t")
-    #
-    # data.sleeplog.sub <- data.sleeplog[, c(1, 2, 3)]
+    sleeplog_file <- list.files(paths$workdir, pattern = "sleeplog.csv")[i]
+    data.sleeplog <- read.csv(file = file.path(paths$workdir, sleeplog_file), sep = "\t")
 
   }
 
 
 
-  if (length(list.files(pattern = "sleeplog.csv")) == 0 &&
-     length(list.files(pattern = "markers.csv")) == 1) { # Check for Marker file
+  if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) == 0 &&
+     length(list.files(paths$workdir, pattern = "markers.csv")) == 1) { # Check for Marker file
     message("Only Event marker file found in working directory!")
     message("Generating sleeplog from marker file!")
 
-
-    # # Run sleeplog_from_markers.R
-    workdir <- getwd()
-    # # debug(sleeplog_from_markers)
-    sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
+    sleeplog_from_markers(workdir = paths$workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
   }
 
 
-  if (length(list.files(pattern = "sleeplog.csv")) == 0 &&
-     length(list.files(pattern = "markers.csv")) > 1) { # Check for Marker file
+  if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) == 0 &&
+     length(list.files(paths$workdir, pattern = "markers.csv")) > 1) { # Check for Marker file
     message("Multiple marker files found in working directory!")
-    # message("Searching for person-specific marker file!")
-    #
-    # which_ppns_log <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-    #                          list.files(pattern = "markers.csv"))
-    #
-    # message("Person-specific marker file found!")
     message("Generating sleeplog from marker file!")
-
-
-    # # Run sleeplog_from_markers.R
-    # workdir <- getwd()
-    # # debug(sleeplog_from_markers)
-    # sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files)
-
-
-    # workdir <- getwd()
-    # sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files)
-    # workdir <- sleepdatadir
   }
 
 
 
-  if (length(list.files(pattern = "sleeplog.csv")) != 0 &&
-     length(list.files(pattern = "markers.csv")) != 0) { # Check for Marker file
+  if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) != 0 &&
+     length(list.files(paths$workdir, pattern = "markers.csv")) != 0) { # Check for Marker file
     message("Both marker file AND Sleeplog found in working directory!")
 
     message("Checking for person-specific markers and/or sleeplog!")
 
     which_ppns_markers <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-                                                      list.files(pattern = "markers.csv")) # markers of this ppn
+                                                      list.files(paths$workdir, pattern = "markers.csv")) # markers of this ppn
 
     which_ppns_sleeplog <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-                                 list.files(pattern = "sleeplog.csv")) #sleeplog of this ppn
+                                 list.files(paths$workdir, pattern = "sleeplog.csv")) #sleeplog of this ppn
 
-
-    #
-    # if (is.na(which_ppns_markers) && !is.na(which_ppns_sleeplog))
 
     ## If there is a sleeplog AND this sleeplog belongs to this ppn
-    if (length(list.files(pattern = "sleeplog.csv")) != 0 && !is.na(which_ppns_sleeplog)) {
+    if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) != 0 && !is.na(which_ppns_sleeplog)) {
 
-      data.sleeplog <- read.csv(file = list.files(pattern = "sleeplog.csv")[which_ppns_sleeplog])
+      sleeplog_file <- list.files(paths$workdir, pattern = "sleeplog.csv")[which_ppns_sleeplog]
+      data.sleeplog <- read.csv(file = file.path(paths$workdir, sleeplog_file))
 
     } else {
-      sleeplog_from_markers(workdir = workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
+      sleeplog_from_markers(workdir = paths$workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
 
       which_ppns_sleeplog <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-                                    list.files(pattern = "sleeplog.csv")) #sleeplog of this ppn
+                                    list.files(paths$workdir, pattern = "sleeplog.csv")) #sleeplog of this ppn
 
-          data.sleeplog <- read.csv(file = list.files(pattern = "sleeplog.csv")[which_ppns_sleeplog])
-         }
+      sleeplog_file <- list.files(paths$workdir, pattern = "sleeplog.csv")[which_ppns_sleeplog]
+      data.sleeplog <- read.csv(file = file.path(paths$workdir, sleeplog_file))
+    }
 
 
     message("Selecting sleeplog only!")
@@ -506,21 +479,10 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
   }
 
-  # ## Create "Results" directory:
-  workdir_temp <- getwd()
-  dir.create(file.path(workdir_temp, "Results"), showWarnings = FALSE)
-  setwd(file.path(workdir_temp, "Results"))
-
   ## Write sleepdata output as .CSV into "Results" directory:
-  # write.csv(sleepdata.overview, file = paste("sleepdata", i, ".csv", sep = ""))
-
-  write.csv(sleepdata.overview, file = paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-                                             "-sleep-results.csv", sep = ""))
-
-
-  ## Set working directory back to main working directory:
-  setwd(workdir_temp)
-  rm(workdir_temp)
+  ensure_dir(paths$results_dir)
+  write.csv(sleepdata.overview, file = file.path(paths$results_dir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
+                                             "-sleep-results.csv", sep = "")))
 
   # Return a result
   sleepdata.overview

@@ -72,12 +72,15 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
   ## Step 1: Basic Operations-----------------------------------------------------------------
 
-  ## Set working directory:
-  setwd(workdir)
+  ## Build the absolute-path structure used throughout this function (and
+  ## passed down to sleepdata_overview()/sleeplog_from_markers()/
+  ## plot_actogram()), replacing the previous setwd()-based approach.
+  paths <- actman_paths(workdir, sleepdatadir)
+  workdir <- paths$workdir
 
   ## List actigraphy files and seperate out sleeplogs:
   pattern_file <- ".csv"
-  ACTdata.files <- sort(list.files(getwd(), pattern = pattern_file))
+  ACTdata.files <- sort(list.files(paths$workdir, pattern = pattern_file))
   if (any((grep(pattern = "sleeplog", x = ACTdata.files)))) {
     ACTdata.files <- ACTdata.files[-(grep(pattern = "sleeplog", x = ACTdata.files))] # Remove any sleeplogs from data listing
   }
@@ -110,10 +113,10 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     stop(paste("The number of start periods does not match the number of data files found:", startperiod, length(ACTdata.files)))
   }
 
-  if (".mtn" %in% substr(list.files(getwd()), nchar(list.files(getwd())) - 4 + 1, nchar(list.files(getwd())))) {
+  if (".mtn" %in% substr(list.files(paths$workdir), nchar(list.files(paths$workdir)) - 4 + 1, nchar(list.files(paths$workdir)))) {
     message(paste("There is at least 1 unsupported Actigraphy file format present in the working directory!
                   Please convert, stash, or remove these unsupported files before rerunning:"))
-    print(list.files(getwd())[grep(".mtn", list.files(getwd()))])
+    print(list.files(paths$workdir)[grep(".mtn", list.files(paths$workdir))])
     stop()
   }
 
@@ -141,17 +144,17 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     ## devices, in e.g., headers and raw data locations.
     if (myACTdevice == "Actiwatch2") {
 
-      ACTdata.1 <- read.csv(paste(ACTdata.files[i]), header = FALSE)
+      ACTdata.1 <- read.csv(file.path(paths$workdir, ACTdata.files[i]), header = FALSE)
       ACTdata.1.sub <- ACTdata.1[, c(4, 5, 6)]
       colnames(ACTdata.1.sub) <- c("Date", "Time", "Activity")
 
     } else if (myACTdevice == "MW8") {
 
-      ACTdata.1 <- read.csv(paste(ACTdata.files[i]), header = FALSE, fill = TRUE, stringsAsFactors = FALSE, col.names = c("A", "B", "C"))
+      ACTdata.1 <- read.csv(file.path(paths$workdir, ACTdata.files[i]), header = FALSE, fill = TRUE, stringsAsFactors = FALSE, col.names = c("A", "B", "C"))
 
       if (all(is.na(ACTdata.1$B)) && all(is.na(ACTdata.1$C))) { ## Note! If TRUE ACTdata.1 is (suddenly) tab-seperated!
 
-        ACTdata.1 <- read.csv(paste(ACTdata.files[i]), header = FALSE, fill = TRUE, stringsAsFactors = FALSE, col.names = c("A", "B", "C"), sep = "\t")
+        ACTdata.1 <- read.csv(file.path(paths$workdir, ACTdata.files[i]), header = FALSE, fill = TRUE, stringsAsFactors = FALSE, col.names = c("A", "B", "C"), sep = "\t")
 
       }
 
@@ -161,7 +164,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
       if (any(ACTdata.1[, 1] == "Raw data:")) {
         ACTdata.1 <- as.data.frame(ACTdata.1[((which(ACTdata.1[, 1] == "Raw data:")) + 2):nrow(ACTdata.1), ])
       } else {
-        ACTdata.1 <- read.csv(paste(ACTdata.files[i]), header = TRUE, fill = TRUE, stringsAsFactors = FALSE, col.names = c("A", "B", "C"))
+        ACTdata.1 <- read.csv(file.path(paths$workdir, ACTdata.files[i]), header = TRUE, fill = TRUE, stringsAsFactors = FALSE, col.names = c("A", "B", "C"))
       }
 
       ## Make a copy of the original data to work on:
@@ -386,20 +389,16 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
 
     ## Step 2.3: Write managed data to file for analyses-------------------------------------------
-    ## Create a new directory in working directory for writing managed data files.
-    dir.create(file.path(workdir, "Managed Datasets"), showWarnings = FALSE)
-    setwd(file.path(workdir, "Managed Datasets"))
-    ## Set parameters and go to new directory
-    wd <- getwd()
+    ## Create a new directory for writing managed data files.
+    ensure_dir(paths$managed_dir)
     name <- paste(gsub(pattern = ".csv", replacement = "", x = ACTdata.files[i]))
-    newdir <- paste(wd, name, sep = "/")
-    dir.create(newdir, showWarnings = FALSE)
-    setwd(newdir)
+    newdir <- file.path(paths$managed_dir, name)
+    ensure_dir(newdir)
     ## Write managed data:
     ACTdata.1.sub$Date = format(ACTdata.1.sub$Date, "%Y-%m-%d %H:%M:%S")
-    write.table(ACTdata.1.sub, quote = FALSE, row.names = FALSE, 
-      col.names = FALSE, file = paste(gsub(pattern = ".csv", 
-        replacement = "", x = ACTdata.files[i]), "MANAGED.txt"))
+    write.table(ACTdata.1.sub, quote = FALSE, row.names = FALSE,
+      col.names = FALSE, file = file.path(newdir, paste(gsub(pattern = ".csv",
+        replacement = "", x = ACTdata.files[i]), "MANAGED.txt")))
 
     ## Step 2.4: Initialising analyses and funtionalities--------------------------------------
     ## Description: .....
@@ -458,36 +457,15 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
       ACTdata.overview[i, "M10_starttime"] <- r$M10_starttime
     }
 
-    ## Set wd back to main workdir
-    setwd(workdir)
-
-
-    ## Create "Results" directory for rolling window results:
-    workdir_temp <- getwd()
-    dir.create(file.path(workdir_temp, "Results"), showWarnings = FALSE)
-    setwd(file.path(workdir_temp, "Results"))
-
-    ## Write rollingwindow.results to .CSV
-    # if (movingwindow) {
-    #   write.table(rollingwindow.results,
-    #               file = paste("rollingwindow-results", i, ".csv", sep = ""),
-    #               row.names = F, sep = ",")
-    # }
+    ## Write rollingwindow.results to .CSV, if requested
+    ensure_dir(paths$results_dir)
 
     if (movingwindow) {
       write.table(rollingwindow.results,
-                  file = paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-                               "-rollingwindow-results.csv", sep = ""),
+                  file = file.path(paths$results_dir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
+                               "-rollingwindow-results.csv", sep = "")),
                   row.names = F, sep = ",")
     }
-
-
-    paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-          "-sleepresults.csv", sep = "")
-
-    ## Set working directory back to main working directory:
-    setwd(workdir_temp)
-    rm(workdir_temp)
 
 
     ## Sleep Analysis:
@@ -538,22 +516,15 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
   # colnames(ACTdata.1.sub.expvars) <- c("IS", "IV", "RA", "L5", "L5 Start time", "M10", "M10 Start time")
 
 
-  ## Create "Results" directory:
-  workdir_temp <- getwd()
-  dir.create(file.path(workdir_temp, "Results"), showWarnings = FALSE)
-  setwd(file.path(workdir_temp, "Results"))
+  ## Write results of circadian analysis and overview to .CSV
+  ensure_dir(paths$results_dir)
 
-  ## Write results of circadian analysis to .CSV
   if (circadian_analysis) {
-    write.table(ACTdata.1.sub.expvars, file = "ACTdata_circadian_res.csv", sep = ",", row.names = F)
+    write.table(ACTdata.1.sub.expvars, file = file.path(paths$results_dir, "ACTdata_circadian_res.csv"), sep = ",", row.names = F)
   }
 
   ## Write ACTdata.overview to .CSV
-  write.table(ACTdata.overview, file = "ACTdata_overview.csv", sep = ",", row.names = F)
-
-  ## Set working directory back to main working directory:
-  setwd(workdir_temp)
-  rm(workdir_temp)
+  write.table(ACTdata.overview, file = file.path(paths$results_dir, "ACTdata_overview.csv"), sep = ",", row.names = F)
 
 
   ## Returned result.

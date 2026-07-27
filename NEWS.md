@@ -1,5 +1,29 @@
 # ACTman (development)
 
+## Phase 4: path-based I/O and DST-safe date arithmetic
+
+No behavior change to computed results; verified against the full
+characterization/unit test suite (46/46 assertions green).
+
+- Removed every remaining `setwd()`/`getwd()` call from the package
+  (`actman.R`, `sleep_summary.R`, `sleeplog.R`, `actogram.R`). Added
+  `actman_paths()` (`paths.R`): a small structure computed once per call,
+  normalizing `workdir` to an absolute path and pre-computing the
+  `managed_dir`/`results_dir`/`actogram_dir` subdirectory paths used
+  throughout. Every read/write now goes through an explicit path via
+  `file.path()`; no function mutates the R session's working directory.
+- This fixes a real, previously-demonstrated bug: a *relative* `workdir`
+  used to break partway through a run, because `ACTman()` `setwd()`'d into
+  it and then built further paths from the same (now stale-relative)
+  variable. This was worked around in the test harness back in Phase 0/1
+  by always passing an absolute path; it is now fixed at the source, and a
+  new regression test (`test-relative-workdir.R`) exercises the previously-
+  broken case directly.
+- Rewrote `increase_by_days()` using `lubridate::days()` (calendar-based
+  Period arithmetic) instead of manual `gmtoff`-comparison DST correction.
+  Same public behavior (verified by the existing DST unit test), 4 lines
+  instead of ~15. Added `lubridate` to `Imports`.
+
 ## Phase 3: modular file split + full manual
 
 No behavior change (verified against all characterization/unit tests at

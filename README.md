@@ -45,6 +45,7 @@ ACTman depends on:
 | `mice` | Multiple imputation of missing activity values (`na_impute = TRUE`) |
 | `nparACT` | Optional cross-validation against an independent implementation (`nparACT_compare = TRUE`) |
 | `gridExtra` | Plot layout helpers |
+| `lubridate` | DST-safe calendar arithmetic (`increase_by_days()`) |
 | `stats`, `utils`, `graphics`, `grDevices` | Base R functionality (aggregation, plotting, file I/O) |
 
 ## Quick start
@@ -257,6 +258,7 @@ The package is organized as small, mostly-single-responsibility modules.
 ```
 R/
   actman.R              # ACTman(): orchestrates the full pipeline per file
+  paths.R                # actman_paths(): absolute-path structure, no setwd() anywhere in the package
   circadian_metrics.R    # IS/IV/RA/L5/M10 -- pure function, no I/O
   ews_metrics.R          # Mean/Var/SD/CoV/Skewness/Kurtosis/Autocorr/Time-to-recovery -- pure function
   nparcalc.R             # device-aware windowing, delegates to the two modules above
@@ -265,9 +267,13 @@ R/
   sleep_summary.R        # sleepdata_overview(): per-night sleep metrics, uses score_epochs()
   sleeplog.R             # sleeplog_from_markers(): derive a sleeplog from event-marker files
   actogram.R             # plot_actogram(), plot_EWS(), generate_actogram_plot()
-  increase_by_days.R     # DST-aware date arithmetic helper
+  increase_by_days.R     # DST-safe date arithmetic (via lubridate::days())
   utils.R                # shared constants (MINUTES_PER_DAY, window sizes, etc.)
 ```
+
+Every read and write goes through an `actman_paths` object (an absolute,
+pre-normalized set of paths for `workdir`, `managed_dir`, `results_dir`,
+and `actogram_dir`); no function in the package calls `setwd()`.
 
 The circadian and EWS metric functions (`circadian_metrics()`,
 `ews_metrics()`, `score_epochs()`) are pure: given the same input data
@@ -279,8 +285,7 @@ pipeline.
 `ACTman()` itself still does device-specific file reading and preprocessing
 inline (period selection, the 14-day length check, missing-data handling,
 managed-dataset writing) -- extracting those into their own modules is
-tracked as further modernization work, along with moving from repeated
-`setwd()` calls to explicit path-based I/O.
+tracked as further modernization work.
 
 ## Function reference
 
@@ -440,9 +445,6 @@ See `NEWS.md` for the fixes these tests were written to lock in.
 
 ## Known limitations
 
-- File I/O uses repeated `setwd()` rather than explicit paths, which is
-  fragile with relative working directories (see `NEWS.md` and the test
-  suite's own workaround for this).
 - The night-by-night sleep-scoring loop in `sleepdata_overview()` has
   several hand-documented edge cases (irregular Bedtime/Gotup ordering,
   markers spanning midnight) that are handled heuristically rather than

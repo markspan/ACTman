@@ -23,18 +23,15 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files,
                                   on_missing_markers = c("median", "manual", "abort")) {
   on_missing_markers <- match.arg(on_missing_markers)
 
-  ## Set wd
-  setwd(workdir)
+  paths <- actman_paths(workdir)
 
   ## List marker button files and read data
-  mb_files <- list.files(pattern = "markers.csv")
+  mb_files <- list.files(paths$workdir, pattern = "markers.csv")
 
 
   mb_files <- mb_files[pmatch(substr(ACTdata.files[i], 1, 4), mb_files)] # only take marker file from this ppn
 
-  #!
-  # mb_data <- read.csv(mb_files)
-  # mb_data <- read.delim(mb_files)
+  mb_files <- file.path(paths$workdir, mb_files)
 
   mb_data <- read.csv(mb_files)
 
@@ -339,7 +336,7 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files,
 
   ## Write sleeplog to .csv
   write.csv(x = sleeplog,
-            file = paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-                                       "-sleeplog.csv", sep = ""),
+            file = file.path(paths$workdir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
+                                       "-sleeplog.csv", sep = "")),
             row.names = FALSE)
 }

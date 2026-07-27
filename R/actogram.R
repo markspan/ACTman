@@ -31,9 +31,8 @@ plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow
 
 ### Part 1: Basic Operations ----------------------------------------------------------------------------
 
-  # Set and save working directory
-  workdir.save <- getwd()
-  setwd(workdir)
+  paths <- actman_paths(workdir)
+  ensure_dir(paths$actogram_dir)
 
 
 
@@ -132,7 +131,7 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
 
 
   ## Initialise .PDF plot in A4 size (11.7 x 8.3 inches)
-  png(paste("Actigraphy EWS Plot - ", plotme[EWS_count], ".png"), width = 842, height = 595, units = "px")
+  png(file.path(paths$actogram_dir, paste("Actigraphy EWS Plot - ", plotme[EWS_count], ".png")), width = 842, height = 595, units = "px")
 
   ## Create barplot
   bp2 <- barplot(as.numeric(LOLkat[, 2]), plot = FALSE)
@@ -267,7 +266,7 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
   if (plotactogram ==  "48h") {
 
     ## Initialise .PDF plot in A4 size (11.7 x 8.3 inches)
-    pdf(paste("Actigraphy Data - 48h Plot", i, ".pdf"), width = 11.7, height = 8.3)
+    pdf(file.path(paths$actogram_dir, paste("Actigraphy Data - 48h Plot", i, ".pdf")), width = 11.7, height = 8.3)
 
 
      ## Plot initialisation & parameters
@@ -311,7 +310,7 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
   if (plotactogram == "24h") {
 
     ## Initialise .PDF plot in A4 size (11.7 x 8.3 inches)
-    pdf(paste("Actigraphy Data - 24h Plot", i, ".pdf"), width = 11.7, height = 8.3)
+    pdf(file.path(paths$actogram_dir, paste("Actigraphy Data - 24h Plot", i, ".pdf")), width = 11.7, height = 8.3)
 
       par(mfrow = c(14, 1)) # Set parameters for plots
       par(mar = c(0.5, 4, 0.5, 4)) # Set margins
@@ -346,7 +345,5 @@ if (i_want_EWS == TRUE) {  # ## Initialise empty matrix for timestamps and activ
 
 }
   ### Part 6: Finishing Operations -------------------------------------------------------------------
-
-  setwd(workdir.save)
 
 }
