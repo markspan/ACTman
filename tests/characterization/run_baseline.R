@@ -22,12 +22,13 @@ dir.create(out_root, showWarnings = FALSE, recursive = TRUE)
 run_one <- function(name, workdir, device) {
   message("=== Running baseline for: ", name, " (", device, ") ===")
   res <- tryCatch({
-    ACTman(workdir = workdir, myACTdevice = device,
+    result <- ACTman(workdir = workdir, myACTdevice = device,
            iwantsleepanalysis = FALSE, plotactogram = FALSE,
            selectperiod = FALSE, movingwindow = FALSE,
            circadian_analysis = TRUE, nparACT_compare = FALSE,
            na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
            lengthcheck = TRUE, i_want_EWS = FALSE)
+    result$overview # ACTman() now returns a unified actman_result object; see NEWS.md
   }, error = function(e) {
     message("ERROR for ", name, ": ", conditionMessage(e))
     NULL

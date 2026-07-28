@@ -15,12 +15,18 @@ fixtures_root <- normalizePath(testthat::test_path("..", "fixtures"))
 baseline_root <- normalizePath(testthat::test_path("..", "characterization", "output"))
 
 run_overview <- function(workdir, device) {
-  ACTman(workdir = workdir, myACTdevice = device,
-         iwantsleepanalysis = FALSE, plotactogram = FALSE,
-         selectperiod = FALSE, movingwindow = FALSE,
-         circadian_analysis = TRUE, nparACT_compare = FALSE,
-         na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
-         lengthcheck = TRUE, i_want_EWS = FALSE)
+  ## ACTman() now returns a unified actman_result object (see NEWS.md,
+  ## "Item 3: config object + unified return type"); $overview holds the
+  ## same content the function used to return directly when
+  ## circadian_analysis = TRUE, iwantsleepanalysis = FALSE, movingwindow =
+  ## FALSE, so the existing frozen baselines are still valid unchanged.
+  result <- ACTman(workdir = workdir, myACTdevice = device,
+                   iwantsleepanalysis = FALSE, plotactogram = FALSE,
+                   selectperiod = FALSE, movingwindow = FALSE,
+                   circadian_analysis = TRUE, nparACT_compare = FALSE,
+                   na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
+                   lengthcheck = TRUE, i_want_EWS = FALSE)
+  result$overview
 }
 
 test_that("Actiwatch2 pipeline output matches frozen baseline", {

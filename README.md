@@ -55,31 +55,34 @@ ACTman depends on:
 library(ACTman)
 
 ## 1. Just the file-level overview (start/end times, missings, recording length):
-overview <- ACTman(
+result <- ACTman(
   workdir = "~/actigraphy/study1",
   myACTdevice = "Actiwatch2",
   circadian_analysis = FALSE,
   iwantsleepanalysis = FALSE,
   plotactogram = FALSE
 )
+result$overview
 
 ## 2. Overview + non-parametric circadian rhythm variables (IS, IV, RA, L5, M10):
-circadian <- ACTman(
+result <- ACTman(
   workdir = "~/actigraphy/study1",
   myACTdevice = "Actiwatch2",
   circadian_analysis = TRUE
 )
+result$circadian
 
 ## 3. Sleep analysis against a sleeplog.csv (see data format section below):
-sleep <- ACTman(
+result <- ACTman(
   workdir = "~/actigraphy/study1",
   myACTdevice = "MW8",
   iwantsleepanalysis = TRUE,
   lengthcheck = FALSE      # don't require >= 14 nights of sleeplog data
 )
+result$sleep
 
 ## 4. Moving-window circadian + early-warning-signal analysis, with actogram:
-rolling <- ACTman(
+result <- ACTman(
   workdir = "~/actigraphy/study1",
   myACTdevice = "MW8",
   movingwindow = TRUE,
@@ -88,7 +91,15 @@ rolling <- ACTman(
   plotactogram = "24h",
   i_want_EWS = TRUE
 )
+result$rolling_window
 ```
+
+`ACTman()` always returns a single `actman_result` object (an S3 list with
+`$overview`, `$circadian`, `$sleep`, and `$rolling_window`), rather than a
+different bare data frame depending on which flags were set -- so calling
+code never has to guess what a given call returns. Fields for analyses that
+weren't requested are `NULL`; printing the result (`print(result)`, or just
+typing `result` at the console) shows a short summary of what ran.
 
 `ACTman()` prints progress to the console as it works through each file and
 writes intermediate/managed datasets and result CSVs under the working
@@ -265,6 +276,7 @@ The package is organized as small, mostly-single-responsibility modules.
 ```
 R/
   actman.R              # ACTman(): orchestrates the full pipeline per file
+  config.R               # actman_config(): validated configuration object
   paths.R                # actman_paths(): absolute-path structure, no setwd() anywhere in the package
   circadian_metrics.R    # IS/IV/RA/L5/M10 -- pure function, no I/O
   ews_metrics.R          # Mean/Var/SD/CoV/Skewness/Kurtosis/Autocorr/Time-to-recovery -- pure function
@@ -335,9 +347,19 @@ Key arguments:
   `readline()` prompt so batch/CI runs never hang.)
 - `on_missing_markers`: passed through to `sleeplog_from_markers()` -- see below.
 
-Returns: the sleep summary if `iwantsleepanalysis = TRUE`, else the
-rolling-window results if `movingwindow = TRUE`, else the file overview data
-frame.
+Returns: an `actman_result` object (see [Quick start](#quick-start)) with
+`$overview` always present, and `$circadian`/`$sleep`/`$rolling_window`
+populated depending on which analyses were requested.
+
+### `actman_config(...)`
+
+Builds and validates a single configuration object from the same
+parameters as `ACTman()` (myACTdevice, missing-data handling, etc.),
+consolidating validation that used to be scattered across `ACTman()` (and,
+for `myACTdevice`, re-checked on every file in its loop) into one place
+that fails fast. `ACTman()` calls this internally as its first step; it's
+exported so a set of parameters can also be validated or reused
+independently of a specific `ACTman()` call.
 
 ### `nparcalc(myACTdevice, movingwindow, CRV.data, ACTdata.1.sub, out = NULL)`
 

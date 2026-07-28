@@ -1,10 +1,77 @@
 # ACTman 2.0.0
 
-Baseline for this release: `compsy/ACTman@66d8f69` (the last fully-wired
-state before an unreleased local cleanup on a fork stripped most of the
-package's functionality; see Phase 0/1 below). Version bumped from 1.0-3
-to 2.0.0 because Phase 2 and Phase 6 fix bugs that change previously
-(silently incorrect) numeric output.
+## Item 3: config object + unified return type
+
+Breaking change to `ACTman()`'s return value (hence part of the 2.0.0
+bump); verified against the full test suite (67/67 assertions green, up
+from 56).
+
+### Changed
+- Added `actman_config()` (`config.R`): consolidates the parameter
+  validation that used to be scattered across the top of `ACTman()` --
+  including a `myACTdevice` check that was redundantly re-run on every
+  file in the main loop -- into a single validated config object built
+  once, up front. `ACTman()`'s own argument list is unchanged for backward
+  compatibility (existing calls with named arguments keep working); it now
+  simply builds an `actman_config()` as its first step.
+- **`ACTman()` now always returns a single `actman_result` object** (an S3
+  list with `$overview`, `$circadian`, `$sleep`, `$rolling_window`) instead
+  of a different bare data frame depending on which flags were set
+  (previously: the sleep summary if `iwantsleepanalysis`, else the rolling
+  window results if `movingwindow`, else the overview). Fields for
+  analyses that weren't requested are `NULL`. `$overview`'s content is
+  unchanged (same columns/values as the old default return); existing code
+  that did `overview <- ACTman(...)` needs to become
+  `result <- ACTman(...); overview <- result$overview`.
+- Added `print.actman_result()`: a short console summary (which analyses
+  ran, dimensions of each populated field) instead of dumping raw list
+  contents.
+- Note: when `ACTman()` processes multiple files, `$sleep` and
+  `$rolling_window` still reflect only the *last* file processed -- this
+  matches prior behavior (neither was ever accumulated across files; each
+  file's own results are still written to disk in full via the existing
+  per-file CSV writes) and is documented here as a known limitation rather
+  than silently changed.
+
+## Item 2: GitHub Actions CI
+
+- Added `.github/workflows/R-CMD-check.yaml`: runs `R CMD check --as-cran`
+  and the full test suite on every push/PR to `development`, across
+  Linux, macOS, and Windows, on both the current and previous R release.
+- Added `.github/workflows/test-coverage.yaml`: tracks test coverage via
+  `covr` and uploads to Codecov on every push/PR.
+- Removed the stale `.circleci/config.yml`, which pointed at
+  `compsy/ACTman` (a different repository) and was not actually running
+  for this fork. Updated the README badges accordingly.
+
+## Item 1: build hygiene
+
+`R CMD check` went from 1 ERROR + 3 WARNINGs to a single WARNING (a
+sandbox/CI-environment locale limitation, not a package issue).
+
+- Regenerated `NAMESPACE` and `man/*.Rd` via `roxygen2::roxygenise()`,
+  which had never actually been run despite five phases of adding new
+  functions -- none of them were exported or had generated help pages
+  until now.
+- Exported the 9 functions the README already documented as public API
+  (`increase_by_days`, `circadian_metrics`, `ews_metrics`, `nparcalc`,
+  `run_rolling_window`, `score_epochs`, `sleepdata_overview`,
+  `sleeplog_from_markers`, `plot_actogram`) -- previously only `ACTman`
+  itself was exported, so calling any of these required `:::`.
+- Found and fixed an unescaped `%` in a roxygen comment (`0.01%`) that Rd
+  format silently treats as a comment marker, corrupting everything after
+  it in the generated `ACTman.Rd`.
+- Removed `gridExtra` from `Imports`: confirmed via git history it was
+  never actually used, even in the original upstream code.
+- Added missing `@importFrom`/`globalVariables()` declarations
+  (`png`, `abline`, `points`, `mtext`, `median`, `head`, `fix`,
+  `read.delim`, plus NSE/dynamically-created variable names) and missing
+  `@param` docs (`i_want_EWS`, `rollingwindow.results`).
+- Fixed the two remaining bare `stop()` calls (same empty-condition-message
+  issue already fixed once in Phase 5's `plot_actogram()` fix).
+- Bumped `DESCRIPTION`: `Version: 2.0.0`, current date, `RoxygenNote:
+  7.3.1`, added `Encoding: UTF-8` (required by roxygen2) and `withr` to
+  `Suggests`.
 
 ## Phase 6: fix silent per-night sleep-metric corruption (rowname/position bug)
 

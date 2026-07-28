@@ -66,10 +66,22 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
                    on_high_missings = c("continue", "abort"),
                    on_missing_markers = c("median", "manual", "abort")) {
 
-  ## Validate the non-interactive decision parameters up front (fail fast,
-  ## rather than partway through a long-running batch job).
-  on_high_missings <- match.arg(on_high_missings)
-  on_missing_markers <- match.arg(on_missing_markers)
+  ## Consolidate parameter validation into a single config object (fails
+  ## fast, before any file is processed), then unpack it back into local
+  ## variables of the same names so the rest of this function is unchanged.
+  ## See ?actman_config.
+  config <- actman_config(workdir = workdir, sleepdatadir = sleepdatadir, myACTdevice = myACTdevice,
+                          iwantsleepanalysis = iwantsleepanalysis, plotactogram = plotactogram,
+                          selectperiod = selectperiod, startperiod = startperiod, daysperiod = daysperiod,
+                          endperiod = endperiod, movingwindow = movingwindow,
+                          movingwindow.size = movingwindow.size, movingwindow.jump = movingwindow.jump,
+                          circadian_analysis = circadian_analysis, nparACT_compare = nparACT_compare,
+                          na_omit = na_omit, na_impute = na_impute, missings_report = missings_report,
+                          lengthcheck = lengthcheck, i_want_EWS = i_want_EWS,
+                          on_high_missings = on_high_missings, on_missing_markers = on_missing_markers)
+  myACTdevice <- config$myACTdevice
+  on_high_missings <- config$on_high_missings
+  on_missing_markers <- config$on_missing_markers
 
   ## Step 1: Basic Operations-----------------------------------------------------------------
 
@@ -126,11 +138,6 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
   ## Description: ...
 
   for (i in seq_along(ACTdata.files)) {
-
-    ## Test for user-defined arguments:
-    if (myACTdevice != "MW8" && myACTdevice != "Actiwatch2") {
-      stop(paste("Unknown value for myACTdevice (should be MW8, Actiwatch2):", myACTdevice))
-    }
 
     print(paste("*** Start of Dataset", i, "***"))
     print("")
@@ -525,13 +532,46 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
 
   ## Returned result.
-  if (iwantsleepanalysis) {
-    sleepdata.overview
-  } else if (movingwindow) {
-    rollingwindow.results
-  } else {
-    ACTdata.overview
-  }
+  ## Returned result: a single actman_result object instead of a different
+  ## bare data frame depending on which flags were set, so callers no
+  ## longer need to guess what a given call returns. $overview is always
+  ## present (and, when nparACT_compare = FALSE, includes the circadian
+  ## columns merged in, same content as before); $circadian/$sleep/
+  ## $rolling_window are NULL when the corresponding analysis wasn't run.
+  ## NOTE: when processing multiple files, $sleep and $rolling_window
+  ## reflect only the last file processed (matching prior behavior --
+  ## sleepdata.overview/rollingwindow.results were never accumulated across
+  ## files; each file's own results are still written to disk in full via
+  ## the per-file CSV writes above).
+  structure(
+    list(
+      overview = ACTdata.overview,
+      circadian = if (circadian_analysis) ACTdata.1.sub.expvars else NULL,
+      sleep = if (iwantsleepanalysis) sleepdata.overview else NULL,
+      rolling_window = if (movingwindow) rollingwindow.results else NULL
+    ),
+    class = "actman_result"
+  )
+}
+
+#' print.actman_result
+#'
+#' Console print method for the object returned by `ACTman()`. Shows a
+#' short summary of which analyses ran and how large each result is,
+#' rather than dumping every component's full contents.
+#'
+#' @param x An `actman_result` object.
+#' @param ... Ignored (kept for S3 method compatibility).
+#'
+#' @return `x`, invisibly.
+#' @export
+print.actman_result <- function(x, ...) {
+  cat("<actman_result>\n")
+  cat(sprintf("  $overview:       %d file(s) x %d column(s)\n", nrow(x$overview), ncol(x$overview)))
+  cat(sprintf("  $circadian:      %s\n", if (is.null(x$circadian)) "NULL (circadian_analysis = FALSE)" else sprintf("%d file(s) x %d column(s)", nrow(x$circadian), ncol(x$circadian))))
+  cat(sprintf("  $sleep:          %s\n", if (is.null(x$sleep)) "NULL (iwantsleepanalysis = FALSE)" else sprintf("%d night(s) x %d column(s)", nrow(x$sleep), ncol(x$sleep))))
+  cat(sprintf("  $rolling_window: %s\n", if (is.null(x$rolling_window)) "NULL (movingwindow = FALSE)" else sprintf("%d window(s) x %d column(s)", nrow(x$rolling_window), ncol(x$rolling_window))))
+  invisible(x)
 }
 
 #' Data included in the package

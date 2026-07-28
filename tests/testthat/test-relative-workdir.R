@@ -24,7 +24,8 @@ test_that("ACTman works with a relative workdir (no more setwd()-based fragility
            iwantsleepanalysis = FALSE, plotactogram = FALSE, circadian_analysis = TRUE)
   )
 
-  expect_s3_class(result, "data.frame")
-  expect_equal(nrow(result), 1)
+  expect_s3_class(result, "actman_result")
+  expect_s3_class(result$overview, "data.frame")
+  expect_equal(nrow(result$overview), 1)
   expect_true(file.exists(file.path("relative_data_dir", "Results", "ACTdata_overview.csv")))
 })
