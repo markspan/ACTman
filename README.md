@@ -504,10 +504,28 @@ See `NEWS.md` for the fixes these tests were written to lock in.
   `RA`/`L5`/`M10`/`L5_starttime` agree closely to exactly between the two
   independent implementations, `IS`/`IV` show moderate divergence, and
   `M10_starttime` shows a more notable divergence (~1.5 hours on the
-  bundled example recording) that isn't yet fully root-caused (see
-  `todo.md`) -- both implementations use a structurally identical
-  sliding-window approach, so this most likely reflects a day-boundary/
-  alignment difference rather than a fundamentally different method.
+  bundled example recording) that isn't yet fully root-caused -- both
+  implementations use a structurally identical sliding-window approach, so
+  this most likely reflects a day-boundary/alignment difference rather
+  than a fundamentally different method.
+- `plot_actogram()` limits (and requires) recordings to 14 days rather than
+  adapting to the actual data length.
+- Sleep variables are matched to a night in the sleeplog by row/iteration
+  number rather than by date, and actogram/data files are likewise reported
+  by iteration number rather than filename -- both work correctly for the
+  common case (one file per participant, sleeplog rows in date order) but
+  are a latent source of misalignment if that assumption doesn't hold.
+- `sleep_summary.R`'s per-night loop uses very terse variable names (`aaa`,
+  `tempp`, `sleepend`, `rownr.*`); left as-is rather than renamed
+  mechanically until test coverage of its edge-case branches is strong
+  enough to do so safely (see `NEWS.md`, Phase 5).
+- `actogram.R` builds per-day variables via `assign()`/`eval(parse())`
+  rather than a list; the least idiomatic remaining pattern in the
+  codebase, not yet replaced.
+- The EWS-overlay-on-real-rolling-window-data path in `plot_actogram()`
+  (`i_want_EWS = TRUE` with real, non-`NA` rolling window results) has no
+  test coverage; only the error path (`NA` results) is currently tested
+  (see the `# nolint` block in `actogram.R`).
 
 ## Changelog
 

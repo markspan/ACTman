@@ -1,5 +1,29 @@
 # ACTman 2.0.0
 
+## Housekeeping: remove obsolete branches, scripts, and Docker setup
+
+- Deleted the per-phase feature branches (`phase-1-2-...` through
+  `phase-6-...`); all their work is already in `development` (and was
+  merged there phase-by-phase as each landed). Only `development` and
+  `master` remain going forward.
+- Removed `todo.md`: folded its not-yet-addressed items into README's
+  "Known limitations" section (the completed DST item was already noted in
+  NEWS.md), so nothing tracked there is lost, but there's now one place
+  (README) for known issues instead of two.
+- Removed `Dockerfile`, `test.Dockerfile`, and `docker_configs/`: an old
+  OpenCPU-based Docker setup that already referenced
+  `inst/bash/install-package-dependencies.sh`, itself removed as stale in
+  Item 4 -- these Dockerfiles were already broken before this cleanup.
+- Removed `scripts/actman_runner.R` and `scripts/runners.R`: personal dev
+  scripts hardcoding local machine paths (`/Users/ando/...`, `C:/mydata`),
+  referencing a `myACTdevice = "Actical"` device that was never
+  implemented, the `movingwindow.size = TRUERUE` typo bug noted very early
+  in this modernization effort, and the pre-`actman_result` return API --
+  fully superseded by `vignette("actman-intro")`.
+- Cleaned up dead `.Rbuildignore` entries left over from the above
+  (`circle.yml`, `.circleci`, `scripts`, `Dockerfile` x2,
+  `docker_configs`).
+
 ## Item 6: scientific validation harness
 
 Verified against the full test suite (78/78 assertions green, up from 71).

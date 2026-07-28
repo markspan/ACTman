@@ -49,7 +49,7 @@ test_that("ACTman's circadian metrics agree with the independent nparACT package
   ## IS and IV show more meaningful (but bounded) divergence between the
   ## two independent implementations -- likely differing edge-case/
   ## windowing conventions rather than a bug in either, but not yet
-  ## root-caused; tracked in todo.md. This assertion exists to catch a
+  ## root-caused; tracked in README's "Known limitations". This assertion exists to catch a
   ## *worsening* of that divergence, not to claim closer agreement than
   ## is actually observed.
   expect_equal(ours$IS, ours$r2.IS, tolerance = 0.15)
@@ -70,7 +70,7 @@ test_that("ACTman's circadian metrics agree with the independent nparACT package
   ## hypothesis to start from, and printed so it's visible in test output
   ## rather than silently passing.
   message(sprintf(
-    "M10_starttime: ACTman = %s, nparACT = %s (documented divergence, see todo.md)",
+    "M10_starttime: ACTman = %s, nparACT = %s (documented divergence, see README)",
     ours$M10_starttime, ours$r2.M10_starttime
   ))
 })

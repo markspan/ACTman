@@ -2,16 +2,8 @@
 ^\.Rproj\.user$
 .git
 ^.gitignore$
-^circle.yml$
-^Dockerfile$
-^scripts$
-^test.Dockerfile$
-^todo.md$
-.circleci
-docker_configs
-^Dockerfile$
+^_pkgdown\.yml$
+^docs$
 tests/fixtures/.*/Managed Datasets
 tests/fixtures/.*/Results
 ^\.github$
-^_pkgdown\.yml$
-^docs$
