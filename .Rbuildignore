@@ -10,3 +10,5 @@
 .circleci
 docker_configs
 ^Dockerfile$
+tests/fixtures/.*/Managed Datasets
+tests/fixtures/.*/Results

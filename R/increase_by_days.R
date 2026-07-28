@@ -23,6 +23,7 @@
 #' increase_by_days("2025-03-10 10:00:00", -3)
 #'
 #' @importFrom lubridate days
+#' @export
 increase_by_days <- function(timeobj, nr_days) {
   as.POSIXct(timeobj) + lubridate::days(nr_days)
 }

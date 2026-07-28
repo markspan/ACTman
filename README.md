@@ -44,7 +44,6 @@ ACTman depends on:
 | `moments` | Skewness and kurtosis (EWS metrics) |
 | `mice` | Multiple imputation of missing activity values (`na_impute = TRUE`) |
 | `nparACT` | Optional cross-validation against an independent implementation (`nparACT_compare = TRUE`) |
-| `gridExtra` | Plot layout helpers |
 | `lubridate` | DST-safe calendar arithmetic (`increase_by_days()`) |
 | `stats`, `utils`, `graphics`, `grDevices` | Base R functionality (aggregation, plotting, file I/O) |
 

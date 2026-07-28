@@ -54,6 +54,7 @@
 #'
 #' @importFrom stats na.pass aggregate
 #' @importFrom utils tail
+#' @export
 circadian_metrics <- function(CRV.data, movingwindow = FALSE) {
   result <- list()
 

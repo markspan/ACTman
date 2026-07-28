@@ -18,7 +18,11 @@
 #'
 #' @importFrom utils read.csv
 #' @importFrom utils write.csv
+#' @importFrom utils read.delim
+#' @importFrom utils fix
+#' @importFrom stats median
 #'
+#' @export
 sleeplog_from_markers <- function(workdir, i, ACTdata.files,
                                   on_missing_markers = c("median", "manual", "abort")) {
   on_missing_markers <- match.arg(on_missing_markers)

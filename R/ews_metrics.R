@@ -42,6 +42,7 @@
 #'
 #' @importFrom stats na.pass sd var acf
 #' @importFrom moments skewness kurtosis
+#' @export
 ews_metrics <- function(CRV.data) {
   result <- list()
   activity <- CRV.data[, "Activity"]

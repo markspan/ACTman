@@ -18,9 +18,20 @@ nparcalc(myACTdevice, movingwindow, CRV.data, ACTdata.1.sub, out = NULL)
 \item{out}{Optional. When movingwindow is TRUE, this is the current window of data.}
 }
 \value{
-A list with the result values IS, IV, RA, L5, L5_starttime, M10, and M10_starttime.
+A named list combining the outputs of \code{\link{circadian_metrics}}
+  and \code{\link{ews_metrics}}, plus \code{CRV_data} (the windowed data
+  actually used for the calculations).
 }
 \description{
-Calculate non-parametrical circadian rhythm variables:
-IS, IV, RA, L5, L5_starttime, M10, and M10_starttime.
+Device- and moving-window-aware entry point for circadian rhythm and
+early-warning-signal analysis. Handles column normalization and windowing
+(which portion of the recording to analyze, depending on device and
+whether a moving window is in use), then delegates the actual statistics
+to \code{\link{circadian_metrics}} (IS, IV, RA, L5, M10) and
+\code{\link{ews_metrics}} (Mean, Variance, SD, CoV, Skewness, Kurtosis,
+autocorrelation, time to recovery). Kept as a single entry point for
+backward compatibility with existing callers/scripts.
+}
+\seealso{
+\code{\link{circadian_metrics}}, \code{\link{ews_metrics}}
 }

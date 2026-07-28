@@ -1,15 +1,15 @@
 Package: ACTman
 Type: Package
 Title: Actigraphy manager
-Version: 1.0-3
-Date: 2017-11-13
+Version: 2.0.0
+Date: 2026-07-28
 Authors@R: c(person("Kunkels,","Y. K.",role = c("aut","cre"),
     email = "y.k.kunkels@umcg.nl"),
     person("Knapen,","S.,",role = c("aut","ctb"),
     email = "stefan.knapen@gmail.com"),
     person("Emerencia,","A. C.",role = c("aut","ctb"),
     email = "ando.emerencia@gmail.com"))
-BugReports: https://github.com/compsy/ACTman/issues
+BugReports: https://github.com/markspan/ACTman/issues
 Maintainer: Yoram Kunkels <y.k.kunkels@umcg.nl>
 Description: ACTman manages actigraphy data whilst offering
     pre-processing and analyses options. This initial version
@@ -17,16 +17,17 @@ Description: ACTman manages actigraphy data whilst offering
     devices, whilst allowing for both sleep and circadian
     rhythm analyses.
 License: MIT + file LICENSE
+Encoding: UTF-8
 Suggests:
     testthat,
-    roxygen2
+    roxygen2,
+    withr
 Imports:
     dplyr,
     stats,
     nparACT,
-    gridExtra,
     mice,
     moments,
     lubridate
 Depends: R (>= 2.10)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.3.1

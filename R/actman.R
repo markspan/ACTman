@@ -32,7 +32,8 @@
 #' @param na_impute Boolean value indicating whether NA's should be imputed.
 #' @param missings_report Boolean value indicating whether missings promt should appear.
 #' @param lengthcheck Boolean value. If TRUE, the dataset is shortened to the start date plus 14 days, and observations more than 14 days after the start date are removed.
-#' @param on_high_missings What to do when more than 0.01% of a dataset's activity values are missing and `missings_report` is TRUE. One of `"continue"` (default; proceed with the analysis and note the situation) or `"abort"` (stop processing this dataset). Replaces the old interactive `readline()` prompt so batch/CI runs never hang.
+#' @param i_want_EWS Boolean value indicating whether early-warning-signal statistics (see `?ews_metrics`) should be overlaid on the actogram plot. Requires `movingwindow = TRUE` in the same call, since it plots against the rolling-window results.
+#' @param on_high_missings What to do when more than 0.01\% of a dataset's activity values are missing and `missings_report` is TRUE. One of `"continue"` (default; proceed with the analysis and note the situation) or `"abort"` (stop processing this dataset). Replaces the old interactive `readline()` prompt so batch/CI runs never hang.
 #' @param on_missing_markers What to do when the sleeplog derived from marker/button-press files has missing Bedtime/Gotup values. One of `"median"` (default; impute missing times with the median), `"manual"` (open an interactive editor via `fix()`; only usable in an interactive session), or `"abort"` (stop). Replaces the old interactive `readline()` prompt.
 #'
 #' @return if iwantsleepanalysis, this returns the sleepdata overview, else if movingwindow, it returns the moving window results, and otherwise it returns the actdata overview.
@@ -117,7 +118,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     message(paste("There is at least 1 unsupported Actigraphy file format present in the working directory!
                   Please convert, stash, or remove these unsupported files before rerunning:"))
     print(list.files(paths$workdir)[grep(".mtn", list.files(paths$workdir))])
-    stop()
+    stop("Unsupported .mtn file(s) found in workdir; convert, stash, or remove them before rerunning.")
   }
 
 

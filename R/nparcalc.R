@@ -22,6 +22,7 @@
 #' @seealso \code{\link{circadian_metrics}}, \code{\link{ews_metrics}}
 #'
 #' @importFrom utils tail
+#' @export
 nparcalc <- function(myACTdevice, movingwindow, CRV.data, ACTdata.1.sub, out = NULL) {
 
   ## Step 1: Normalize columns and window the data to the period of interest ---------------

@@ -14,6 +14,8 @@
 #' @importFrom stats na.omit
 #' @importFrom utils read.csv
 #' @importFrom utils write.csv
+#' @importFrom utils head
+#' @export
 sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
                                on_missing_markers = c("median", "manual", "abort")) {
   on_missing_markers <- match.arg(on_missing_markers)
@@ -41,7 +43,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
     message("Also please make sure that the name of the sleeplog file ends in 'sleeplog.csv'!")
     message("")
     message("Stopping sleep-analyses...")
-    stop()
+    stop("No sleeplog or Event marker file found in workdir; provide one to run sleep analysis.")
   }
 
 

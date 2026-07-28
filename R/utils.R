@@ -30,6 +30,8 @@ MAX_AUTOCORR_LAG <- 120L
 #' @param x A positive numeric value.
 #' @return The smallest power of 10 that is >= x.
 #' @examples
+#' \dontrun{
 #' roundup_power_10(342)  # 1000
 #' roundup_power_10(8)    # 10
+#' }
 roundup_power_10 <- function(x) 10 ^ ceiling(log10(x))

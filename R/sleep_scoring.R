@@ -37,6 +37,7 @@
 #'   and \code{wakeup.chance}.
 #'
 #' @importFrom dplyr mutate lag lead
+#' @export
 score_epochs <- function(aaa) {
   aaa <- dplyr::mutate(aaa, score = (
     (dplyr::lag(Activity..MW.counts., n = 1L, default = 0) / 5) +

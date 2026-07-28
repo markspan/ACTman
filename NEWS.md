@@ -1,4 +1,10 @@
-# ACTman (development)
+# ACTman 2.0.0
+
+Baseline for this release: `compsy/ACTman@66d8f69` (the last fully-wired
+state before an unreleased local cleanup on a fork stripped most of the
+package's functionality; see Phase 0/1 below). Version bumped from 1.0-3
+to 2.0.0 because Phase 2 and Phase 6 fix bugs that change previously
+(silently incorrect) numeric output.
 
 ## Phase 6: fix silent per-night sleep-metric corruption (rowname/position bug)
 

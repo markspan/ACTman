@@ -23,6 +23,7 @@
 #'   \code{L5_starttime}, \code{M10}, \code{M10_starttime}, \code{Mean},
 #'   \code{Variance}, \code{SD}, \code{Coeff_of_Var}, \code{Skewness},
 #'   \code{Kurtosis}, \code{Autocorr_lag1/2/3/60/120}, \code{Time_to_Recovery}.
+#' @export
 run_rolling_window <- function(x, window, jump, myACTdevice, ACTdata.1.sub, verbose = TRUE) {
   out <- data.frame()
   n <- nrow(x)
