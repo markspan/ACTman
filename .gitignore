@@ -5,3 +5,4 @@ tests/fixtures/*/Managed\ Datasets/
 tests/fixtures/*/Results/
 *.tar.gz
 docs
+Rplots.pdf
