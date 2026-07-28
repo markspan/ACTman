@@ -162,7 +162,7 @@ ACTman(
 
 actogram_file <- list.files(file.path(workdir, "Actograms"), full.names = TRUE, pattern = "\\.pdf$")[1]
 actogram_file
-#> [1] "/tmp/Rtmpx7eyXG/actman-vignette-1b7b6a6d2635/Actograms/Actigraphy Data - 24h Plot 1 .pdf"
+#> [1] "/tmp/RtmpaU9v4R/actman-vignette-1b6a54280e6c/Actograms/Actigraphy Data - 24h Plot 1 .pdf"
 ```
 
 [`plot_actogram()`](https://markspan.github.io/ACTman/reference/plot_actogram.md)

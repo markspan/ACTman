@@ -39,6 +39,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="actman-200">ACTman 2.0.0<a class="anchor" aria-label="anchor" href="#actman-200"></a></h2>
 <div class="section level3">
+<h3 id="fix-r-cmd-check-failures-on-ci-newer-r-version-2-0-0">Fix R CMD check failures on CI (newer R version)<a class="anchor" aria-label="anchor" href="#fix-r-cmd-check-failures-on-ci-newer-r-version-2-0-0"></a></h3>
+<p>The <code>R-CMD-check</code> workflow failed on macOS with R 4.6.1 (passed locally on this environment’s R 4.3.3), surfacing two real, fixable issues:</p>
+<ul><li>
+<code>checking for code/documentation mismatches ... WARNING</code>: <code>data(ACTdata.1)</code> couldn’t find the dataset. The underlying file was <code>data/yoramdata.RData</code>, but R’s <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data()</a></code> lookup expects the file’s base name to match the object name it contains (<code>ACTdata.1</code>) unless a <code>data/datalist</code> mapping file is provided; this apparently wasn’t enforced as strictly on R 4.3.3 but is on 4.6.1. Renamed the file to <code>data/ACTdata.1.RData</code> – the object itself is unchanged, only the file name.</li>
+<li>
+<code>checking for hidden files and directories ... NOTE</code>: <code>.lintr</code> was being bundled into the built tarball (it wasn’t in <code>.Rbuildignore</code>). Added it; this doesn’t affect the separate <code>lint</code> CI workflow, which runs <code>lintr::lint_package()</code> directly against the source checkout, not the built tarball.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="update-ews-reference-2-0-0">Update EWS reference<a class="anchor" aria-label="anchor" href="#update-ews-reference-2-0-0"></a></h3>
 <p>Replaced the Scheffer et al. (2009) and Van de Leemput et al. (2014) citations for the early-warning-signal statistics (<code><a href="../reference/ews_metrics.html">ews_metrics()</a></code>, README, vignette) with Helmich, Schreuder, Bringmann, Riese, Snippe &amp; Smit (2024), “Slow down and be critical before using early warning signals in psychopathology” (<em>Nature Reviews Psychology</em>, 3, 767-780). Since this paper takes a critical/cautionary stance on using EWS-based critical slowing down to predict mental health symptom changes – unlike the two references it replaces – the surrounding descriptive text was also updated to reflect that framing accurately, rather than just swapping the citation in place.</p>
 </div>
