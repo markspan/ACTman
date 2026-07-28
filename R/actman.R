@@ -594,6 +594,10 @@ print.actman_result <- function(x, ...) {
 #' format). No missing values. See `vignette("actman-intro")` for a full
 #' walkthrough.
 #'
+#' \strong{Provenance:} included by the package's original author, Yoram
+#' Kunkels, as example data (added 2017; see package \code{LICENSE}, which
+#' lists him as copyright holder).
+#'
 #' @format A data frame with 94,721 rows and 3 variables:
 #' \describe{
 #'   \item{A}{Date, as \code{"YYYY-MM-DD"}}

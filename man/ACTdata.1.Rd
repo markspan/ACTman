@@ -25,6 +25,11 @@ raw device file -- for a raw-format example file usable directly with
 format). No missing values. See `vignette("actman-intro")` for a full
 walkthrough.
 }
+\details{
+\strong{Provenance:} included by the package's original author, Yoram
+Kunkels, as example data (added 2017; see package \code{LICENSE}, which
+lists him as copyright holder).
+}
 \references{
 Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M.,
   Riese, H., & Emerencia, A. C. (2020). ACTman: Automated preprocessing
