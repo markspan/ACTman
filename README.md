@@ -14,6 +14,11 @@ This document is a full manual: installation, concepts, data formats, a
 function-by-function reference with examples, the package's internal
 architecture, and the scientific literature the calculations are based on.
 
+A full worked example using a real (anonymized) actigraphy recording is
+available as a vignette: `vignette("actman-intro", package = "ACTman")`,
+or browse the built documentation site at
+<https://markspan.github.io/ACTman/>.
+
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [Supported devices and data formats](#supported-devices-and-data-formats)
@@ -196,11 +201,14 @@ result$RA   # e.g. 0.81
 ### Sleep scoring and the sleep log
 
 Per-epoch wake/sleep classification (`score_epochs()`, used internally by
-`sleepdata_overview()`) is a neighbor-weighted activity score in the same
-general family as the Cole-Kripke algorithm (Cole et al., 1992): each
-epoch's score combines its own activity count with a weighted contribution
-from the 2 preceding and 2 following epochs, thresholded to classify the
-epoch as "awake" (score > 20) or "asleep."
+`sleepdata_overview()`) is a neighbor-weighted activity score: each epoch's
+score combines its own activity count with a weighted contribution from the
+2 preceding and 2 following epochs, thresholded to classify the epoch as
+"awake" (score > 20) or "asleep." Per Kunkels et al. (2020) -- the paper
+describing ACTman itself -- this specific weighting scheme is based on
+CamNtech's own MotionWare "Information Bulletin No. 3" documentation for
+the MotionWatch 8 device; it's in the same general family of approach as
+the independently-developed Cole-Kripke algorithm (Cole et al., 1992).
 
 Sleep onset ("sleep start") and sleep offset ("sleep end") within the
 Bedtime-to-Gotup window are located using rolling sums of a binarized
@@ -497,11 +505,28 @@ See `NEWS.md` for the fixes these tests were written to lock in.
 See [`NEWS.md`](NEWS.md) for the detailed history of bug fixes and
 behavioral changes.
 
+## Citation
+
+If you use ACTman in published work, please cite:
+
+Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M., Riese, H., &
+Emerencia, A. C. (2020). ACTman: Automated preprocessing and analysis of
+actigraphy data. *Journal of Science and Medicine in Sport*, 23(5), 481-486.
+https://doi.org/10.1016/j.jsams.2019.11.009
+
 ## References
+
+CamNtech (2013). Information Bulletin No. 3: Sleep Analysis Algorithms.
+MotionWare software documentation, CamNtech Ltd. (source of the epoch
+weighting scheme used in `score_epochs()`, per Kunkels et al. 2020.)
 
 Cole, R. J., Kripke, D. F., Gruen, W., Mullaney, D. J., & Gillin, J. C.
 (1992). Automatic sleep/wake identification from wrist activity. *Sleep*,
 15(5), 461-469.
+
+Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M., Riese, H., &
+Emerencia, A. C. (2020). ACTman: Automated preprocessing and analysis of
+actigraphy data. *Journal of Science and Medicine in Sport*, 23(5), 481-486.
 
 Scheffer, M., Bascompte, J., Brock, W. A., Brovkin, V., Carpenter, S. R.,
 Dakos, V., Held, H., van Nes, E. H., Rietkerk, M., & Sugihara, G. (2009).

@@ -13,3 +13,5 @@ docker_configs
 tests/fixtures/.*/Managed Datasets
 tests/fixtures/.*/Results
 ^\.github$
+^_pkgdown\.yml$
+^docs$

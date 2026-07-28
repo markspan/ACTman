@@ -82,12 +82,22 @@ whilst allowing for both sleep and circadian rhythm analyses.
 }
 \examples{
 \dontrun{
-View(ACTman::ACTman(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part/mydata2",
-                    myACTdevice = "Actiwatch2",
-                    iwantsleepanalysis = FALSE,
-                    plotactogram = FALSE,
-                    selectperiod = FALSE,
-                    startperiod = "2016-10-03 00:00:00",
-                    daysperiod = 14, movingwindow = FALSE, circadian_analysis = TRUE))
+## Using the real, anonymized example recording bundled with the package
+## (see vignette("actman-intro") for a full walkthrough):
+workdir <- tempfile()
+dir.create(workdir)
+file.copy(
+  system.file("extdata", "example-mw8-participant.csv", package = "ACTman"),
+  file.path(workdir, "participant01.csv")
+)
+result <- ACTman(
+  workdir = workdir,
+  myACTdevice = "MW8",
+  circadian_analysis = TRUE,
+  iwantsleepanalysis = FALSE,
+  plotactogram = FALSE,
+  lengthcheck = FALSE
+)
+result$circadian
 }
 }

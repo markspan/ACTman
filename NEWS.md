@@ -1,5 +1,56 @@
 # ACTman 2.0.0
 
+## Item 5: vignette, pkgdown site, and real data
+
+Verified against the full test suite (71/71 assertions green, up from 67).
+
+- **Bundled a real, anonymized example recording**: a ~33-day MotionWatch 8
+  recording (2017-07-05 to 2017-08-07, 94,721 observations at 30-second
+  epochs) is now properly documented as `data(ACTdata.1)` (its docstring
+  previously cited a broken placeholder URL). A ~7-day subset, in genuine
+  raw MW8 export format, is bundled at `inst/extdata/example-mw8-participant.csv`
+  for demonstrating the full file-reading pipeline.
+- **Found and fixed a real integration bug via this real data**:
+  `plot_actogram()`'s Phase 5 midnight-truncation fix used `format()` on
+  `Date`, which broke when called through the actual `ACTman()` pipeline --
+  there, `Date` arrives already as a character string (reformatted
+  upstream before the managed dataset is written), not the `POSIXct` that
+  `plot_actogram()`'s own standalone unit tests use. Fixed to handle both
+  cases; added a permanent regression test
+  (`test-actman-params.R`) that calls `ACTman(..., plotactogram = ...)`
+  end-to-end on real data -- this integration path had no test coverage
+  before, which is exactly why the bug wasn't caught earlier.
+- **Corrected a citation**: fetched and read the actual paper describing
+  ACTman (Kunkels et al., 2020, *Journal of Science and Medicine in
+  Sport*). The sleep-scoring epoch-weighting scheme is sourced from
+  CamNtech's own MotionWare "Information Bulletin No. 3," not the
+  Cole-Kripke algorithm as speculatively cited in Phase 3/5 -- fixed in
+  `score_epochs()`'s docstring and the README, with Cole-Kripke retained as
+  related (independently-developed) context rather than the primary
+  source. Added a "Citation" section to the README with the real paper.
+- Added a full vignette (`vignettes/actman-intro.Rmd`) walking through
+  reading real data, interpreting the circadian rhythm variables,
+  actogram generation, and moving-window analysis -- verified by actually
+  rendering it (not just checking it parses). Real output values are
+  properly noisy/realistic (IS = 0.5, IV = 0.81) compared to the
+  near-perfect synthetic sine-wave fixtures used elsewhere in the test
+  suite.
+- Set up `pkgdown` (config in `_pkgdown.yml`, deployment via
+  `.github/workflows/pkgdown.yaml` to GitHub Pages). Confirmed Rd parsing,
+  reference index generation, and vignette building all succeed; the one
+  remaining failure locally (fetching a JS asset from `cdnjs.cloudflare.com`)
+  is a sandbox network restriction in the environment this work was done
+  in, not a package or config problem -- a real GitHub Actions runner has
+  full internet access.
+- Removed the stale, un-runnable `@examples` block on `ACTman()` (an old
+  Windows path, pre-`actman_result`-API example that also broke pkgdown's
+  Rd parser) and replaced it with a working example using the bundled real
+  data.
+- Updated `todo.md` (previously stale/un-tracked) to reflect current state:
+  checked off the now-completed DST item, and added a few items identified
+  during this modernization effort (EWS-overlay test coverage, the
+  `assign()`/`eval(parse())` pattern in `actogram.R`, etc.).
+
 ## Item 4: style enforcement (lintr + styler)
 
 Verified against the full test suite (67/67 assertions green throughout).

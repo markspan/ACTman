@@ -21,7 +21,9 @@ Encoding: UTF-8
 Suggests:
     testthat,
     roxygen2,
-    withr
+    withr,
+    knitr,
+    rmarkdown
 Imports:
     dplyr,
     stats,
@@ -30,4 +32,5 @@ Imports:
     moments,
     lubridate
 Depends: R (>= 2.10)
+VignetteBuilder: knitr
 RoxygenNote: 7.3.1

@@ -48,7 +48,17 @@ plot_actogram <- function(workdir, ACTdata.1.sub, i, plotactogram, rollingwindow
   ## exactly midnight (e.g. "2020-01-01 00:00:00" prints as "2020-01-01"),
   ## which breaks the substr(Date, 12, 19) == "00:00:00" day-boundary checks
   ## below whenever the very first recorded minute happens to be midnight.
-  act_data <- within(act_data, Date <- format(act_data$Date, "%Y-%m-%d %H:%M:%S"))
+  ## Date may already be a character string here (as it is when called from
+  ## ACTman(), which reformats it to "%Y-%m-%d %H:%M:%S" before writing the
+  ## managed dataset) or a POSIXct/POSIXlt (as when plot_actogram() is called
+  ## standalone, per its documented usage). format() on an already-character
+  ## vector misinterprets the format string as the `trim` argument, so only
+  ## convert when it isn't already character. Using format() rather than
+  ## as.character() for the POSIXct case avoids as.character()'s
+  ## midnight-truncation bug (see NEWS.md, Phase 5).
+  if (!is.character(act_data$Date)) {
+    act_data <- within(act_data, Date <- format(act_data$Date, "%Y-%m-%d %H:%M:%S"))
+  }
   ndays.plot <- round(abs(as.numeric(round(as.POSIXct(act_data$Date[1]) - as.POSIXct(act_data$Date[nrow(act_data)]), 2))))
 
 

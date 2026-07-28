@@ -39,13 +39,23 @@
 #' @return if iwantsleepanalysis, this returns the sleepdata overview, else if movingwindow, it returns the moving window results, and otherwise it returns the actdata overview.
 #' @examples
 #' \dontrun{
-#' View(ACTman::ACTman(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part/mydata2",
-#'   myACTdevice = "Actiwatch2",
+#' ## Using the real, anonymized example recording bundled with the package
+#' ## (see vignette("actman-intro") for a full walkthrough):
+#' workdir <- tempfile()
+#' dir.create(workdir)
+#' file.copy(
+#'   system.file("extdata", "example-mw8-participant.csv", package = "ACTman"),
+#'   file.path(workdir, "participant01.csv")
+#' )
+#' result <- ACTman(
+#'   workdir = workdir,
+#'   myACTdevice = "MW8",
+#'   circadian_analysis = TRUE,
 #'   iwantsleepanalysis = FALSE,
 #'   plotactogram = FALSE,
-#'   selectperiod = FALSE,
-#'   startperiod = "2016-10-03 00:00:00",
-#'   daysperiod = 14, movingwindow = FALSE, circadian_analysis = TRUE))
+#'   lengthcheck = FALSE
+#' )
+#' result$circadian
 #' }
 #' @importFrom stats na.omit
 #' @importFrom utils View
@@ -567,11 +577,33 @@ print.actman_result <- function(x, ...) {
   invisible(x)
 }
 
-#' Data included in the package
+#' Example actigraphy data
+#'
+#' A real, anonymized MotionWatch 8 (CamNtech) actigraphy recording: ~33
+#' days (2017-07-05 to 2017-08-07) at 30-second epochs (94,721
+#' observations), already extracted to the 3-column Date/Time/Activity form
+#' `ACTman()` produces internally after reading a raw MW8 export (i.e. this
+#' is what `ACTdata.1.sub` looks like partway through the pipeline, not a
+#' raw device file -- for a raw-format example file usable directly with
+#' `ACTman(myACTdevice = "MW8", ...)`, see
+#' `system.file("extdata", "example-mw8-participant.csv", package =
+#' "ACTman")`, a ~7-day subset of the same recording in real MW8 export
+#' format). No missing values. See `vignette("actman-intro")` for a full
+#' walkthrough.
+#'
+#' @format A data frame with 94,721 rows and 3 variables:
+#' \describe{
+#'   \item{A}{Date, as \code{"YYYY-MM-DD"}}
+#'   \item{B}{Time, as \code{"HH:MM:SS"} (30-second epochs)}
+#'   \item{C}{Activity count for that epoch}
+#' }
 #'
 #' @name ACTdata.1
 #' @docType data
 #' @author Yoram K. Kunkels \email{y.k.kunkels@umcg.nl}
-#' @references \url{exampledata.com}
+#' @references Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M.,
+#'   Riese, H., & Emerencia, A. C. (2020). ACTman: Automated preprocessing
+#'   and analysis of actigraphy data. \emph{Journal of Science and Medicine
+#'   in Sport}, 23(5), 481-486.
 #' @keywords data
 NULL

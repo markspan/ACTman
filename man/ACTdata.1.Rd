@@ -3,12 +3,33 @@
 \docType{data}
 \name{ACTdata.1}
 \alias{ACTdata.1}
-\title{Data included in the package}
+\title{Example actigraphy data}
+\format{
+A data frame with 94,721 rows and 3 variables:
+\describe{
+  \item{A}{Date, as \code{"YYYY-MM-DD"}}
+  \item{B}{Time, as \code{"HH:MM:SS"} (30-second epochs)}
+  \item{C}{Activity count for that epoch}
+}
+}
 \description{
-Data included in the package
+A real, anonymized MotionWatch 8 (CamNtech) actigraphy recording: ~33
+days (2017-07-05 to 2017-08-07) at 30-second epochs (94,721
+observations), already extracted to the 3-column Date/Time/Activity form
+`ACTman()` produces internally after reading a raw MW8 export (i.e. this
+is what `ACTdata.1.sub` looks like partway through the pipeline, not a
+raw device file -- for a raw-format example file usable directly with
+`ACTman(myACTdevice = "MW8", ...)`, see
+`system.file("extdata", "example-mw8-participant.csv", package =
+"ACTman")`, a ~7-day subset of the same recording in real MW8 export
+format). No missing values. See `vignette("actman-intro")` for a full
+walkthrough.
 }
 \references{
-\url{exampledata.com}
+Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M.,
+  Riese, H., & Emerencia, A. C. (2020). ACTman: Automated preprocessing
+  and analysis of actigraphy data. \emph{Journal of Science and Medicine
+  in Sport}, 23(5), 481-486.
 }
 \author{
 Yoram K. Kunkels \email{y.k.kunkels@umcg.nl}

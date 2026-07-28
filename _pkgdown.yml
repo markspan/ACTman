@@ -1,0 +1,53 @@
+url: https://markspan.github.io/ACTman/
+
+template:
+  bootstrap: 5
+
+home:
+  title: "ACTman: Actigraphy Manager"
+
+reference:
+- title: Main entry point
+  contents:
+  - ACTman
+  - actman_config
+  - print.actman_result
+
+- title: Circadian rhythm and early-warning-signal analysis
+  desc: >
+    Pure computation functions; also used internally by ACTman() and
+    run_rolling_window().
+  contents:
+  - nparcalc
+  - circadian_metrics
+  - ews_metrics
+  - run_rolling_window
+
+- title: Sleep analysis
+  contents:
+  - sleepdata_overview
+  - sleeplog_from_markers
+  - score_epochs
+
+- title: Plotting
+  contents:
+  - plot_actogram
+
+- title: Utilities
+  contents:
+  - increase_by_days
+
+- title: Example data
+  contents:
+  - ACTdata.1
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Getting started
+        href: articles/actman-intro.html
