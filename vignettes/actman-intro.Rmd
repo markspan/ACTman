@@ -153,7 +153,8 @@ Each row is one 3-day window; `IS`/`IV`/`RA` are the same circadian
 variables as before, now tracked across the recording, alongside
 early-warning-signal statistics (`Mean`, `SD`, autocorrelation, etc. --
 see `?ews_metrics`) that have been explored as potential indicators of
-mood-state transitions in longer recordings (Van de Leemput et al., 2014).
+mood-state transitions in longer recordings, though see Helmich et al.
+(2024) for a critical perspective on the current evidence for this use.
 
 ## Sleep analysis
 

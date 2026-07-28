@@ -32,21 +32,18 @@ Early warning signals are statistical indicators, originally developed in
 the study of complex dynamical systems (e.g. ecosystem collapse), that can
 precede a critical transition -- rising variance, rising autocorrelation,
 and slower recovery from perturbation ("critical slowing down") are
-classic examples. Applied to actigraphy, they have been explored as
-possible early indicators of impending state transitions in mood or
-health (e.g. an approaching depressive episode).
+classic examples. They have been explored as possible early indicators of
+impending state transitions in mood or health (e.g. an approaching
+depressive episode); Helmich et al. (2024) provide a critical
+perspective on this literature, arguing that current empirical and
+theoretical support for using early-warning-signal-based critical
+slowing down to predict changes in mental health symptoms is limited,
+and that these limitations should be kept in mind when interpreting the
+EWS statistics below.
 }
 \references{
-Scheffer, M., Bascompte, J., Brock, W. A., Brovkin, V., Carpenter, S. R.,
-Dakos, V., Held, H., van Nes, E. H., Rietkerk, M., & Sugihara, G. (2009).
-Early-warning signals for critical transitions. \emph{Nature}, 461(7260),
-53-59.
-
-Van de Leemput, I. A., Wichers, M., Cramer, A. O. J., Borsboom, D.,
-Tuerlinckx, F., Kuppens, P., van Nes, E. H., Viechtbauer, W., Giltay, E.
-J., Aggen, S. H., Derom, C., Jacobs, N., Kendler, K. S., van der Maas, H.
-L. J., Neale, M. C., Peeters, F., Thiery, E., Zachar, P., & Scheffer, M.
-(2014). Critical slowing down as early warning for the onset and
-termination of depression. \emph{Proceedings of the National Academy of
-Sciences}, 111(1), 87-92.
+Helmich, M. A., Schreuder, M. J., Bringmann, L. F., Riese, H., Snippe,
+E., & Smit, A. C. (2024). Slow down and be critical before using early
+warning signals in psychopathology. \emph{Nature Reviews Psychology},
+3, 767-780.
 }
