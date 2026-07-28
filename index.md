@@ -277,12 +277,15 @@ statistics below change over the course of a longer recording.
 Early warning signals
 ([`ews_metrics()`](https://markspan.github.io/ACTman/reference/ews_metrics.md))
 are a set of statistics originally developed for anticipating critical
-transitions in complex dynamical systems (Scheffer et al., 2009) –
-rising variance and autocorrelation, and slower “recovery” from
-perturbation, can precede a qualitative shift in system state. They have
-since been explored as potential early indicators of mood-state
-transitions from actigraphy and other time series (Van de Leemput et
-al., 2014):
+transitions in complex dynamical systems – rising variance and
+autocorrelation, and slower “recovery” from perturbation, can precede a
+qualitative shift in system state. They have been explored as potential
+early indicators of mood-state transitions from actigraphy and other
+time series, though Helmich et al. (2024) provide a critical perspective
+on this literature, arguing that current empirical and theoretical
+support for using these signals to predict mental health symptom changes
+is limited – worth keeping in mind when interpreting the statistics
+below:
 
 - `Mean`, `Variance`, `SD`, `CoV` (coefficient of variation, %)
 - `Skewness`, `Kurtosis`
@@ -644,23 +647,15 @@ Cole, R. J., Kripke, D. F., Gruen, W., Mullaney, D. J., & Gillin, J. C.
 (1992). Automatic sleep/wake identification from wrist activity.
 *Sleep*, 15(5), 461-469.
 
+Helmich, M. A., Schreuder, M. J., Bringmann, L. F., Riese, H., Snippe,
+E., & Smit, A. C. (2024). Slow down and be critical before using early
+warning signals in psychopathology. *Nature Reviews Psychology*, 3,
+767-780.
+
 Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M., Riese, H., &
 Emerencia, A. C. (2020). ACTman: Automated preprocessing and analysis of
 actigraphy data. *Journal of Science and Medicine in Sport*, 23(5),
 481-486.
-
-Scheffer, M., Bascompte, J., Brock, W. A., Brovkin, V., Carpenter, S.
-R., Dakos, V., Held, H., van Nes, E. H., Rietkerk, M., & Sugihara, G.
-(2009). Early-warning signals for critical transitions. *Nature*,
-461(7260), 53-59.
-
-Van de Leemput, I. A., Wichers, M., Cramer, A. O. J., Borsboom, D.,
-Tuerlinckx, F., Kuppens, P., van Nes, E. H., Viechtbauer, W., Giltay, E.
-J., Aggen, S. H., Derom, C., Jacobs, N., Kendler, K. S., van der Maas,
-H. L. J., Neale, M. C., Peeters, F., Thiery, E., Zachar, P., & Scheffer,
-M. (2014). Critical slowing down as early warning for the onset and
-termination of depression. *Proceedings of the National Academy of
-Sciences*, 111(1), 87-92.
 
 Van Someren, E. J. W., Swaab, D. F., Colenda, C. C., Cohen, W., McCall,
 W. V., & Rosenquist, P. B. (1999). Bright light therapy: improved

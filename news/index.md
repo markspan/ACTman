@@ -2,6 +2,20 @@
 
 ## ACTman 2.0.0
 
+### Update EWS reference
+
+Replaced the Scheffer et al. (2009) and Van de Leemput et al. (2014)
+citations for the early-warning-signal statistics
+([`ews_metrics()`](https://markspan.github.io/ACTman/reference/ews_metrics.md),
+README, vignette) with Helmich, Schreuder, Bringmann, Riese, Snippe &
+Smit (2024), “Slow down and be critical before using early warning
+signals in psychopathology” (*Nature Reviews Psychology*, 3, 767-780).
+Since this paper takes a critical/cautionary stance on using EWS-based
+critical slowing down to predict mental health symptom changes – unlike
+the two references it replaces – the surrounding descriptive text was
+also updated to reflect that framing accurately, rather than just
+swapping the citation in place.
+
 ### Fix pkgdown CI build failure
 
 The `pkgdown` GitHub Actions workflow failed on its first real run with

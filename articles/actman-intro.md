@@ -162,7 +162,7 @@ ACTman(
 
 actogram_file <- list.files(file.path(workdir, "Actograms"), full.names = TRUE, pattern = "\\.pdf$")[1]
 actogram_file
-#> [1] "/tmp/Rtmpa2hSF5/actman-vignette-1c02514acc0f/Actograms/Actigraphy Data - 24h Plot 1 .pdf"
+#> [1] "/tmp/Rtmpx7eyXG/actman-vignette-1b7b6a6d2635/Actograms/Actigraphy Data - 24h Plot 1 .pdf"
 ```
 
 [`plot_actogram()`](https://markspan.github.io/ACTman/reference/plot_actogram.md)
@@ -370,7 +370,8 @@ early-warning-signal statistics (`Mean`, `SD`, autocorrelation, etc. –
 see
 [`?ews_metrics`](https://markspan.github.io/ACTman/reference/ews_metrics.md))
 that have been explored as potential indicators of mood-state
-transitions in longer recordings (Van de Leemput et al., 2014).
+transitions in longer recordings, though see Helmich et al. (2024) for a
+critical perspective on the current evidence for this use.
 
 ## Sleep analysis
 
