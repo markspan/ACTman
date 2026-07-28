@@ -1,5 +1,13 @@
 # To-do list for ACTman
 
+- [ ] Investigate the ~1.5 hour M10_starttime divergence between ACTman
+      and nparACT on real data (see `test-nparact-validation.R` and
+      README's "Known limitations"). Both packages use a structurally
+      identical sliding-window approach (confirmed against nparACT's
+      source), so the likely cause is a day-boundary/alignment difference
+      in which minute counts as "position 1" of the averaged 24-hour
+      profile -- not yet pinned down further.
+
 - [x] Update daylight-saving-time method -- done via `lubridate::days()` in
       `increase_by_days()` (Item 3/Phase 4, see NEWS.md).
 - [ ] Make `plot_actogram()` responsive to data length, instead of the

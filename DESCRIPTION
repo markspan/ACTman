@@ -23,11 +23,11 @@ Suggests:
     roxygen2,
     withr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    nparACT
 Imports:
     dplyr,
     stats,
-    nparACT,
     mice,
     moments,
     lubridate

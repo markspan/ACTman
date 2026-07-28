@@ -498,7 +498,16 @@ See `NEWS.md` for the fixes these tests were written to lock in.
   formally verified; see inline `#!` comments in the source for known rough
   edges.
 - Device support is limited to Actiwatch 2 and MotionWatch 8 exports.
-- `nparACT_compare = TRUE` requires the separate `nparACT` package.
+- `nparACT_compare = TRUE` requires the separate `nparACT` package
+  (`Suggests`, not `Imports` -- only needed for this specific feature).
+  Cross-validated against real data (see `test-nparact-validation.R`):
+  `RA`/`L5`/`M10`/`L5_starttime` agree closely to exactly between the two
+  independent implementations, `IS`/`IV` show moderate divergence, and
+  `M10_starttime` shows a more notable divergence (~1.5 hours on the
+  bundled example recording) that isn't yet fully root-caused (see
+  `todo.md`) -- both implementations use a structurally identical
+  sliding-window approach, so this most likely reflects a day-boundary/
+  alignment difference rather than a fundamentally different method.
 
 ## Changelog
 

@@ -1,5 +1,36 @@
 # ACTman 2.0.0
 
+## Item 6: scientific validation harness
+
+Verified against the full test suite (78/78 assertions green, up from 71).
+
+- Installed the real `nparACT` package (from its CRAN mirror at
+  `github.com/cran/nparACT`) and ran a genuine cross-validation of
+  ACTman's circadian metrics against it on the real bundled example
+  recording -- an independent, peer-reviewed implementation of the same
+  published method (Van Someren et al., 1999), not just internal
+  consistency checking. Results: `RA`/`L5`/`M10` agree closely,
+  `L5_starttime` matches exactly, `IS`/`IV` show moderate divergence, and
+  `M10_starttime` shows a more notable ~1.5 hour divergence. Investigated
+  the latter against nparACT's own source: both packages use a
+  structurally identical sliding-window approach, so this is most likely a
+  day-boundary/alignment difference rather than a fundamentally different
+  method -- not yet fully root-caused, tracked in `todo.md`.
+- Added `test-nparact-validation.R`: a permanent test asserting the
+  above agreement stays within tolerances set close to (not looser than)
+  the currently-observed agreement, so it catches a future *regression* in
+  cross-implementation agreement rather than just asserting a comfortable
+  pass. Skips cleanly when `nparACT` isn't installed.
+- **Fixed a real dependency-hygiene issue found along the way**: `nparACT`
+  was a hard `Imports` dependency despite being used only for the optional
+  `nparACT_compare = TRUE` feature, forcing every ACTman install to also
+  pull in `ggplot2`/`stringr`/`zoo`. Moved to `Suggests`, with a clear
+  `requireNamespace()` check and error message if `nparACT_compare = TRUE`
+  is requested without it installed (previously would have failed with a
+  cryptic "could not find function" error instead).
+- Documented the full comparison in README's "Known limitations" and
+  `todo.md`.
+
 ## Item 5: vignette, pkgdown site, and real data
 
 Verified against the full test suite (71/71 assertions green, up from 67).

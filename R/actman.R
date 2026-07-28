@@ -453,6 +453,9 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     }
     ## If a comparison with another actigraphy R package is required, run nparACT_base_loop{nparACT}:
     if (nparACT_compare) {
+      if (!requireNamespace("nparACT", quietly = TRUE)) {
+        stop("nparACT_compare = TRUE requires the 'nparACT' package. Install it with install.packages('nparACT').")
+      }
       ## Use nparACT Package to calculate circadian rhythm variables:
       r <- nparACT::nparACT_base_loop(path = newdir, SR = 1 / 60, fulldays = TRUE, plot = TRUE)
 
