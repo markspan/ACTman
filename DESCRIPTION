@@ -10,6 +10,7 @@ Authors@R: c(person("Kunkels,","Y. K.",role = c("aut","cre"),
     person("Emerencia,","A. C.",role = c("aut","ctb"),
     email = "ando.emerencia@gmail.com"))
 BugReports: https://github.com/markspan/ACTman/issues
+URL: https://github.com/markspan/ACTman, https://markspan.github.io/ACTman/
 Maintainer: Yoram Kunkels <y.k.kunkels@umcg.nl>
 Description: ACTman manages actigraphy data whilst offering
     pre-processing and analyses options. This initial version

@@ -23,6 +23,7 @@
 #'   Datasets" under \code{workdir}), \code{results_dir} ("Results" under
 #'   \code{workdir}), and \code{actogram_dir} ("Actograms" under
 #'   \code{workdir}).
+#' @keywords internal
 actman_paths <- function(workdir, sleepdatadir = workdir) {
   workdir <- normalizePath(workdir, mustWork = TRUE)
   sleepdatadir <- tryCatch(
@@ -49,6 +50,7 @@ actman_paths <- function(workdir, sleepdatadir = workdir) {
 #'
 #' @param path Directory path to ensure exists.
 #' @return \code{path}, invisibly.
+#' @keywords internal
 ensure_dir <- function(path) {
   dir.create(path, showWarnings = FALSE, recursive = TRUE)
   invisible(path)

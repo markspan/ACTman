@@ -17,3 +17,4 @@ Creates a directory (recursively, silently if it already exists) and
 returns the path invisibly, so it can be used inline:
 \code{write.csv(x, file.path(ensure_dir(paths$results_dir), "out.csv"))}.
 }
+\keyword{internal}

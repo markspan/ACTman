@@ -34,4 +34,5 @@ MAX_AUTOCORR_LAG <- 120L
 #' roundup_power_10(342)  # 1000
 #' roundup_power_10(8)    # 10
 #' }
+#' @keywords internal
 roundup_power_10 <- function(x) 10^ceiling(log10(x))

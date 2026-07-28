@@ -1,5 +1,21 @@
 # ACTman 2.0.0
 
+## Fix pkgdown CI build failure
+
+The `pkgdown` GitHub Actions workflow failed on its first real run with two
+issues visible only once real internet access reached the point past this
+sandbox's own network restrictions:
+
+- `DESCRIPTION` was missing a `URL` field matching the configured pkgdown
+  site (`https://markspan.github.io/ACTman/`) -- added.
+- Three internal helper functions (`actman_paths`, `ensure_dir`,
+  `roundup_power_10`) had `man/*.Rd` pages but weren't listed in
+  `_pkgdown.yml`'s reference index, which pkgdown treats as an error rather
+  than silently including them. Tagged all three `@keywords internal`
+  (matching how the shared constants were already tagged), which is also
+  the more accurate/intended state for functions not part of the
+  documented public API.
+
 ## Housekeeping: remove obsolete branches, scripts, and Docker setup
 
 - Deleted the per-phase feature branches (`phase-1-2-...` through

@@ -34,3 +34,4 @@ path. No function in this package changes the process's working
 directory any more; every read/write goes through an \code{actman_paths}
 object instead.
 }
+\keyword{internal}

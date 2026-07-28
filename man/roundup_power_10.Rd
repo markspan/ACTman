@@ -22,3 +22,4 @@ roundup_power_10(342)  # 1000
 roundup_power_10(8)    # 10
 }
 }
+\keyword{internal}
