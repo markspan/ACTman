@@ -4,6 +4,7 @@
 ^.gitignore$
 ^_pkgdown\.yml$
 ^docs$
+^\.lintr$
 tests/fixtures/.*/Managed Datasets
 tests/fixtures/.*/Results
 ^\.github$

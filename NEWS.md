@@ -1,5 +1,23 @@
 # ACTman 2.0.0
 
+## Fix R CMD check failures on CI (newer R version)
+
+The `R-CMD-check` workflow failed on macOS with R 4.6.1 (passed locally on
+this environment's R 4.3.3), surfacing two real, fixable issues:
+
+- `checking for code/documentation mismatches ... WARNING`: `data(ACTdata.1)`
+  couldn't find the dataset. The underlying file was `data/yoramdata.RData`,
+  but R's `data()` lookup expects the file's base name to match the object
+  name it contains (`ACTdata.1`) unless a `data/datalist` mapping file is
+  provided; this apparently wasn't enforced as strictly on R 4.3.3 but is on
+  4.6.1. Renamed the file to `data/ACTdata.1.RData` -- the object itself is
+  unchanged, only the file name.
+- `checking for hidden files and directories ... NOTE`: `.lintr` was being
+  bundled into the built tarball (it wasn't in `.Rbuildignore`). Added it;
+  this doesn't affect the separate `lint` CI workflow, which runs
+  `lintr::lint_package()` directly against the source checkout, not the
+  built tarball.
+
 ## Update EWS reference
 
 Replaced the Scheffer et al. (2009) and Van de Leemput et al. (2014)
