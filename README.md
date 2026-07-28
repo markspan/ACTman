@@ -1,6 +1,8 @@
 # ACTman
 
-[![CircleCI](https://circleci.com/gh/compsy/ACTman.svg?style=svg&circle-token=d4a53fd8f5a7813e4cacd9265bb5de8fe8b44336)](https://circleci.com/gh/compsy/ACTman)
+[![R-CMD-check](https://github.com/markspan/ACTman/actions/workflows/R-CMD-check.yaml/badge.svg?branch=development)](https://github.com/markspan/ACTman/actions/workflows/R-CMD-check.yaml)
+[![test-coverage](https://github.com/markspan/ACTman/actions/workflows/test-coverage.yaml/badge.svg?branch=development)](https://github.com/markspan/ACTman/actions/workflows/test-coverage.yaml)
+[![Codecov test coverage](https://codecov.io/gh/markspan/ACTman/branch/development/graph/badge.svg)](https://codecov.io/gh/markspan/ACTman)
 
 **ACTman** is an R package for managing and analyzing wrist actigraphy data.
 It ingests raw exports from supported actigraphy devices, computes standard
@@ -431,6 +433,11 @@ devtools::test()
 # or, from a shell:
 R CMD check .
 ```
+
+Every push and pull request against `development` runs the full test suite
+and `R CMD check --as-cran` across Linux, macOS, and Windows via GitHub
+Actions (`.github/workflows/R-CMD-check.yaml`), plus test coverage tracking
+via `covr`/Codecov (`.github/workflows/test-coverage.yaml`).
 
 The test suite includes:
 
