@@ -27,7 +27,7 @@ make_sleep_fixture <- function(dir) {
     Gotup = c("07:00", "07:00")
   )
   write.table(sleeplog, file.path(dir, "P01-sleeplog.csv"),
-              sep = "\t", row.names = FALSE, quote = FALSE)
+    sep = "\t", row.names = FALSE, quote = FALSE)
 
   list(actdata = actdata, dir = dir)
 }
@@ -39,7 +39,7 @@ test_that("sleepdata_overview runs end-to-end on a clean 2-night fixture without
 
   result <- expect_no_error(
     sleepdata_overview(workdir = fx$dir, actdata = fx$actdata, i = 1,
-                       lengthcheck = FALSE, ACTdata.files = "P01.csv")
+      lengthcheck = FALSE, ACTdata.files = "P01.csv")
   )
 
   expect_s3_class(result, "data.frame")
@@ -53,7 +53,7 @@ test_that("sleepdata_overview produces a plausible sleep efficiency for a clean 
   withr::local_dir(fx$dir)
 
   result <- sleepdata_overview(workdir = fx$dir, actdata = fx$actdata, i = 1,
-                               lengthcheck = FALSE, ACTdata.files = "P01.csv")
+    lengthcheck = FALSE, ACTdata.files = "P01.csv")
 
   eff <- suppressWarnings(as.numeric(result$sleep.efficiency))
   ## With near-zero activity throughout every scored "asleep" window, the first
@@ -70,7 +70,7 @@ test_that("sleepdata_overview errors clearly when neither sleeplog nor markers f
 
   expect_error(
     sleepdata_overview(workdir = fx$dir, actdata = fx$actdata, i = 1,
-                       lengthcheck = FALSE, ACTdata.files = "P01.csv")
+      lengthcheck = FALSE, ACTdata.files = "P01.csv")
   )
 })
 
@@ -90,7 +90,7 @@ test_that("sleepdata_overview computes consistent assumed_sleep/actual_sleep_per
   withr::local_dir(fx$dir)
 
   result <- sleepdata_overview(workdir = fx$dir, actdata = fx$actdata, i = 1,
-                               lengthcheck = FALSE, ACTdata.files = "P01.csv")
+    lengthcheck = FALSE, ACTdata.files = "P01.csv")
 
   expect_equal(nrow(result), 2)
   assumed_sleep <- suppressWarnings(as.numeric(result$assumed_sleep))
@@ -115,7 +115,7 @@ test_that("sleepdata_overview rejects an invalid on_missing_markers value", {
 
   expect_error(
     sleepdata_overview(workdir = fx$dir, actdata = fx$actdata, i = 1,
-                       lengthcheck = FALSE, ACTdata.files = "P01.csv",
-                       on_missing_markers = "not_a_real_option")
+      lengthcheck = FALSE, ACTdata.files = "P01.csv",
+      on_missing_markers = "not_a_real_option")
   )
 })

@@ -24,7 +24,6 @@
 #' @importFrom utils tail
 #' @export
 nparcalc <- function(myACTdevice, movingwindow, CRV.data, ACTdata.1.sub, out = NULL) {
-
   ## Step 1: Normalize columns and window the data to the period of interest ---------------
 
   if (ncol(CRV.data) > 2) {
@@ -53,7 +52,7 @@ nparcalc <- function(myACTdevice, movingwindow, CRV.data, ACTdata.1.sub, out = N
   ## Step 2: Delegate to the pure metric functions -----------------------------------------
 
   result <- c(circadian_metrics(CRV.data, movingwindow = movingwindow),
-             ews_metrics(CRV.data))
+    ews_metrics(CRV.data))
 
   ## Step 3: Attach the windowed data (some callers/plots use this) -----------------------
   result$CRV_data <- CRV.data

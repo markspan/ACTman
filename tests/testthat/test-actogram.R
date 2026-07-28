@@ -11,11 +11,11 @@ test_that("plot_actogram runs end-to-end and produces a PDF (24h)", {
 
   expect_no_error(
     plot_actogram(workdir = fixture_dir, ACTdata.1.sub = actdata, i = 1,
-                 plotactogram = "24h", rollingwindow.results = NA, i_want_EWS = FALSE)
+      plotactogram = "24h", rollingwindow.results = NA, i_want_EWS = FALSE)
   )
 
   expect_true(file.exists(file.path(fixture_dir, "Actograms",
-                                    "Actigraphy Data - 24h Plot 1 .pdf")))
+    "Actigraphy Data - 24h Plot 1 .pdf")))
 })
 
 test_that("plot_actogram rejects EWS request without rolling window results", {
@@ -25,7 +25,7 @@ test_that("plot_actogram rejects EWS request without rolling window results", {
 
   expect_error(
     plot_actogram(workdir = fixture_dir, ACTdata.1.sub = actdata, i = 1,
-                 plotactogram = "24h", rollingwindow.results = NA, i_want_EWS = TRUE),
+      plotactogram = "24h", rollingwindow.results = NA, i_want_EWS = TRUE),
     "Cannot create EWS plot"
   )
 })

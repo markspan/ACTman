@@ -2,7 +2,7 @@
 ######################################
 #### Sleeplog from Marker buttons ####
 #### YKK                          ####
-####~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*####
+#### ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*####
 
 
 #' sleeplog_from_markers
@@ -65,12 +65,12 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files,
   for (a in seq_len(nrow(mb_data))) {
 
     if (as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") >  as.POSIXct("04:00:00", format = "%H:%M:%S") &&
-       as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") <  as.POSIXct("14:00:00", format = "%H:%M:%S")) {
+      as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") <  as.POSIXct("14:00:00", format = "%H:%M:%S")) {
 
       mb_data[a, "Morning_evening"] <- "Gotup"
 
     } else if (as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") >  as.POSIXct("14:00:00", format = "%H:%M:%S") &&
-              as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") <  (as.POSIXct("04:00:00", format = "%H:%M:%S") + (1440 * 60))) {
+      as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") <  (as.POSIXct("04:00:00", format = "%H:%M:%S") + (1440 * 60))) {
 
       mb_data[a, "Morning_evening"] <- "Bedtime"
 
@@ -84,8 +84,8 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files,
   for (a in seq_len(nrow(mb_data))) {
 
     if ((mb_data[a, "Morning_evening"] == 0) && (mb_data[(a - 1), "Morning_evening"] == "Gotup") &&
-       (mb_data[(a + 1), "Morning_evening"] == "Gotup") && (as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") <
-                                                            as.POSIXct("05:00:00", format = "%H:%M:%S"))) {
+      (mb_data[(a + 1), "Morning_evening"] == "Gotup") && (as.POSIXct(mb_data[a, "Time"], format = "%H:%M:%S") <
+      as.POSIXct("05:00:00", format = "%H:%M:%S"))) {
 
       mb_data[a, "Morning_evening"] <- "Bedtime"
       mb_data[a, "sleep_after_midnight"] <- 1
@@ -98,15 +98,15 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files,
   for (a in seq_len(nrow(mb_data) - 1)) {
 
     if ((mb_data[a, "Morning_evening"] == "Gotup") &&
-       identical(mb_data[a, "Morning_evening"], mb_data[(a + 1), "Morning_evening"]) &&
-       identical(mb_data[a, "Date"], mb_data[(a + 1), "Date"])) {
+      identical(mb_data[a, "Morning_evening"], mb_data[(a + 1), "Morning_evening"]) &&
+      identical(mb_data[a, "Date"], mb_data[(a + 1), "Date"])) {
 
       mb_data[a, "Remove"] <- 1
     }
 
     if ((mb_data[a, "Morning_evening"] == "Bedtime") &&
-       identical(mb_data[a, "Morning_evening"], mb_data[(a + 1), "Morning_evening"]) &&
-       identical(mb_data[a, "Date"], mb_data[(a + 1), "Date"])) {
+      identical(mb_data[a, "Morning_evening"], mb_data[(a + 1), "Morning_evening"]) &&
+      identical(mb_data[a, "Date"], mb_data[(a + 1), "Date"])) {
 
       mb_data[a, "Remove"] <- 1
     }
@@ -225,7 +225,7 @@ sleeplog_from_markers <- function(workdir, i, ACTdata.files,
 
   ## Write sleeplog to .csv
   write.csv(x = sleeplog,
-            file = file.path(paths$workdir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-                                       "-sleeplog.csv", sep = "")),
-            row.names = FALSE)
+    file = file.path(paths$workdir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
+      "-sleeplog.csv", sep = "")),
+    row.names = FALSE)
 }

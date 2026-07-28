@@ -21,18 +21,20 @@ dir.create(out_root, showWarnings = FALSE, recursive = TRUE)
 
 run_one <- function(name, workdir, device) {
   message("=== Running baseline for: ", name, " (", device, ") ===")
-  res <- tryCatch({
-    result <- ACTman(workdir = workdir, myACTdevice = device,
-           iwantsleepanalysis = FALSE, plotactogram = FALSE,
-           selectperiod = FALSE, movingwindow = FALSE,
-           circadian_analysis = TRUE, nparACT_compare = FALSE,
-           na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
-           lengthcheck = TRUE, i_want_EWS = FALSE)
-    result$overview # ACTman() now returns a unified actman_result object; see NEWS.md
-  }, error = function(e) {
-    message("ERROR for ", name, ": ", conditionMessage(e))
-    NULL
-  })
+  res <- tryCatch(
+    {
+      result <- ACTman(workdir = workdir, myACTdevice = device,
+        iwantsleepanalysis = FALSE, plotactogram = FALSE,
+        selectperiod = FALSE, movingwindow = FALSE,
+        circadian_analysis = TRUE, nparACT_compare = FALSE,
+        na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
+        lengthcheck = TRUE, i_want_EWS = FALSE)
+      result$overview # ACTman() now returns a unified actman_result object; see NEWS.md
+    },
+    error = function(e) {
+      message("ERROR for ", name, ": ", conditionMessage(e))
+      NULL
+    })
   if (!is.null(res)) {
     saveRDS(res, file.path(out_root, paste0(name, "_overview.rds")))
     write.csv(res, file.path(out_root, paste0(name, "_overview.csv")), row.names = FALSE)

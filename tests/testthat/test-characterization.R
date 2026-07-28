@@ -21,11 +21,11 @@ run_overview <- function(workdir, device) {
   ## circadian_analysis = TRUE, iwantsleepanalysis = FALSE, movingwindow =
   ## FALSE, so the existing frozen baselines are still valid unchanged.
   result <- ACTman(workdir = workdir, myACTdevice = device,
-                   iwantsleepanalysis = FALSE, plotactogram = FALSE,
-                   selectperiod = FALSE, movingwindow = FALSE,
-                   circadian_analysis = TRUE, nparACT_compare = FALSE,
-                   na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
-                   lengthcheck = TRUE, i_want_EWS = FALSE)
+    iwantsleepanalysis = FALSE, plotactogram = FALSE,
+    selectperiod = FALSE, movingwindow = FALSE,
+    circadian_analysis = TRUE, nparACT_compare = FALSE,
+    na_omit = FALSE, na_impute = FALSE, missings_report = FALSE,
+    lengthcheck = TRUE, i_want_EWS = FALSE)
   result$overview
 }
 

@@ -13,15 +13,15 @@ test_that("ACTman works with a relative workdir (no more setwd()-based fragility
   activity <- round(50 + 40 * sin((as.numeric(format(times, "%H")) * 60 +
     as.numeric(format(times, "%M")) - 6 * 60) / 1440 * 2 * pi))
   data_rows <- data.frame(V1 = seq_along(times), V2 = "Epoch", V3 = "",
-                         V4 = format(times, "%d/%m/%Y"), V5 = format(times, "%H:%M:%S"), V6 = activity)
+    V4 = format(times, "%d/%m/%Y"), V5 = format(times, "%H:%M:%S"), V6 = activity)
   write.table(data_rows, file.path("relative_data_dir", "P01.csv"), sep = ",",
-              row.names = FALSE, col.names = FALSE, quote = FALSE, na = "NA")
+    row.names = FALSE, col.names = FALSE, quote = FALSE, na = "NA")
 
   ## "relative_data_dir" (no leading / or drive letter) is a relative path
   ## from the current working directory set by withr::local_dir() above.
   result <- expect_no_error(
     ACTman(workdir = "relative_data_dir", myACTdevice = "Actiwatch2",
-           iwantsleepanalysis = FALSE, plotactogram = FALSE, circadian_analysis = TRUE)
+      iwantsleepanalysis = FALSE, plotactogram = FALSE, circadian_analysis = TRUE)
   )
 
   expect_s3_class(result, "actman_result")

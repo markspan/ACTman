@@ -45,7 +45,7 @@ run_rolling_window <- function(x, window, jump, myACTdevice, ACTdata.1.sub, verb
     }
 
     r2 <- nparcalc(myACTdevice = myACTdevice, movingwindow = TRUE, CRV.data = CRV.data,
-                   ACTdata.1.sub = ACTdata.1.sub, out = out)
+      ACTdata.1.sub = ACTdata.1.sub, out = out)
 
     rollingwindow.results[i, 1] <- as.character(strftime(CRV.data[1, "Date"], format = "%Y-%m-%d %H:%M:%S"))
     rollingwindow.results[i, 2] <- as.character(strftime(CRV.data[nrow(CRV.data), "Date"], format = "%Y-%m-%d %H:%M:%S"))
@@ -69,10 +69,10 @@ run_rolling_window <- function(x, window, jump, myACTdevice, ACTdata.1.sub, verb
     rollingwindow.results[i, 20] <- r2$Autocorr_lag120
     rollingwindow.results[i, 21] <- r2$Time_to_Recovery
     colnames(rollingwindow.results) <- c("starttime", "endtime", "IS", "IV", "RA", "L5", "L5_starttime",
-                                         "M10", "M10_starttime", "Mean", "Variance", "SD",
-                                         "Coeff_of_Var", "Skewness", "Kurtosis", "Autocorr_lag1",
-                                         "Autocorr_lag2", "Autocorr_lag3", "Autocorr_lag60",
-                                         "Autocorr_lag120", "Time_to_Recovery")
+      "M10", "M10_starttime", "Mean", "Variance", "SD",
+      "Coeff_of_Var", "Skewness", "Kurtosis", "Autocorr_lag1",
+      "Autocorr_lag2", "Autocorr_lag3", "Autocorr_lag60",
+      "Autocorr_lag120", "Time_to_Recovery")
 
     if (verbose) {
       print("---------------------------------------------------------------------------------")

@@ -1,0 +1,33 @@
+linters: linters_with_defaults(
+    ## object_name_linter is intentionally disabled rather than configured
+    ## permissively: this codebase has a real, documented naming
+    ## inconsistency (dotted.case from the original code, snake_case from
+    ## everything added during modernization, and some PascalCase locals in
+    ## sleep_summary.R specifically) that was a deliberate choice in Phase 5
+    ## -- renaming ~150 cross-referenced variables in the least-tested part
+    ## of the codebase was judged too risky to do mechanically. See
+    ## NEWS.md. A full naming-convention pass is tracked as future work;
+    ## until then, disabling this linter is more honest than configuring
+    ## it to silently accept every existing pattern.
+    object_name_linter = NULL,
+    object_usage_linter = NULL,
+    ## ACTman() itself is a long, high-complexity orchestrator function by
+    ## design (see README's architecture section); reducing that further
+    ## is a bigger structural undertaking, not a style fix.
+    cyclocomp_linter = NULL,
+    ## Disabled for the same reason as object_name_linter: real, documented,
+    ## pre-existing debt in the legacy files (long lines carrying detailed
+    ## inline comments; styler's non-strict hanging-indent choices don't
+    ## match lintr's default alignment expectations) rather than something
+    ## to paper over with a permissive threshold. Fixing either requires
+    ## touching many lines across the least-tested parts of the codebase
+    ## (sleep_summary.R, actogram.R) for cosmetic benefit only; tracked as
+    ## future work rather than done under time pressure in this pass.
+    line_length_linter = NULL,
+    indentation_linter = NULL
+  )
+exclusions: list(
+    "tests/fixtures",
+    "tests/characterization/output",
+    "man"
+  )

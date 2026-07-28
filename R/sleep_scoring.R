@@ -54,21 +54,21 @@ score_epochs <- function(aaa) {
   ## non-active epochs, allowing 1 active epoch within that span.
   aaa$epoch.sleep.chance <- ifelse(aaa$Activity..MW.counts. > 6, 1, 0) # 1 is above threshold, 0 is below threshold
   aaa$sleep.chance <- (dplyr::lead(aaa$epoch.sleep.chance, n = 1L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 2L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 3L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 4L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 5L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 6L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 7L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 8L) +
-                        dplyr::lead(aaa$epoch.sleep.chance, n = 9L) +
-                        aaa$epoch.sleep.chance)
+    dplyr::lead(aaa$epoch.sleep.chance, n = 2L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 3L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 4L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 5L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 6L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 7L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 8L) +
+    dplyr::lead(aaa$epoch.sleep.chance, n = 9L) +
+    aaa$epoch.sleep.chance)
 
   aaa$wakeup.chance <- (dplyr::lag(aaa$epoch.sleep.chance, n = 1L) +
-                         dplyr::lag(aaa$epoch.sleep.chance, n = 2L) +
-                         dplyr::lag(aaa$epoch.sleep.chance, n = 3L) +
-                         dplyr::lag(aaa$epoch.sleep.chance, n = 4L) +
-                         aaa$epoch.sleep.chance)
+    dplyr::lag(aaa$epoch.sleep.chance, n = 2L) +
+    dplyr::lag(aaa$epoch.sleep.chance, n = 3L) +
+    dplyr::lag(aaa$epoch.sleep.chance, n = 4L) +
+    aaa$epoch.sleep.chance)
 
   aaa
 }

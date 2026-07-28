@@ -60,21 +60,21 @@ circadian_metrics <- function(CRV.data, movingwindow = FALSE) {
 
   ## IS: Interdaily Stability -------------------------------------------
   xi <- aggregate(CRV.data[, "Activity"],
-                  list(hour = cut(as.POSIXct(CRV.data[, "Date"]), breaks = "hour")),
-                  mean, na.action = na.pass, na.rm = TRUE)
+    list(hour = cut(as.POSIXct(CRV.data[, "Date"]), breaks = "hour")),
+    mean, na.action = na.pass, na.rm = TRUE)
 
   ## Exception for moving window to retain last observation for correct number of observations:
   if (!movingwindow) {
-    xi <- xi[1:(nrow(xi) - 1), ]
+    xi <- xi[seq_len(nrow(xi) - 1), ]
   } else {
-    xi <- xi[1:(nrow(xi)), ]
+    xi <- xi[seq_len(nrow(xi)), ]
   }
   xi <- xi$x
 
   X <- mean(xi, na.rm = TRUE)
 
   xi_X <- xi - X
-  sq.xi_X <- xi_X ^ 2
+  sq.xi_X <- xi_X^2
   sum.sq.xi_X <- sum(sq.xi_X, na.rm = TRUE)
   n <- sum(!is.na(xi))
   sum.sq.xi_X.perhour <- sum.sq.xi_X / n
@@ -82,25 +82,25 @@ circadian_metrics <- function(CRV.data, movingwindow = FALSE) {
   xi_sub <- xi[1:(24 * floor(length(xi) / 24))]
   Xh <- rowMeans(matrix(xi_sub, nrow = 24), na.rm = TRUE)
   Xh_X <- Xh - X
-  sum.sq.Xh_X <- sum(Xh_X ^ 2, na.rm = TRUE)
+  sum.sq.Xh_X <- sum(Xh_X^2, na.rm = TRUE)
   sum.sq.Xh_X.perhour <- sum.sq.Xh_X / 24
 
   result$IS <- round(sum.sq.Xh_X.perhour / sum.sq.xi_X.perhour, 2)
 
   ## IV: Interdaily Variability ------------------------------------------
   Xi_diffXi <- diff(xi)
-  sum.sq.Xi_diffXi <- sum(Xi_diffXi ^ 2, na.rm = TRUE)
+  sum.sq.Xi_diffXi <- sum(Xi_diffXi^2, na.rm = TRUE)
   sum.sq.Xi_diffXi.perhour <- sum.sq.Xi_diffXi / (n - 1)
 
   Xi_X <- xi - X
-  sum.sq.Xi_X <- sum(Xi_X ^ 2, na.rm = TRUE)
+  sum.sq.Xi_X <- sum(Xi_X^2, na.rm = TRUE)
   sum.sq.Xi_X.perhour <- sum.sq.Xi_X / n
 
   result$IV <- round(sum.sq.Xi_diffXi.perhour / sum.sq.Xi_X.perhour, 2)
 
   ## Average-day profile, used by both L5 and M10 ------------------------
   averageday <- matrix(c(substr(CRV.data[1:MINUTES_PER_DAY, "Date"], 14, 22), rep(NA, MINUTES_PER_DAY)),
-                       nrow = MINUTES_PER_DAY, ncol = 2)
+    nrow = MINUTES_PER_DAY, ncol = 2)
   selection_mat <- matrix(FALSE, MINUTES_PER_DAY)
   for (aa in 1:MINUTES_PER_DAY) {
     selection_mat[aa, ] <- TRUE

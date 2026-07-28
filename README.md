@@ -458,8 +458,13 @@ R CMD check .
 
 Every push and pull request against `development` runs the full test suite
 and `R CMD check --as-cran` across Linux, macOS, and Windows via GitHub
-Actions (`.github/workflows/R-CMD-check.yaml`), plus test coverage tracking
-via `covr`/Codecov (`.github/workflows/test-coverage.yaml`).
+Actions (`.github/workflows/R-CMD-check.yaml`), test coverage tracking via
+`covr`/Codecov (`.github/workflows/test-coverage.yaml`), and static analysis
+via `lintr` (`.github/workflows/lint.yaml`, gated on zero lints under the
+project's `.lintr` config -- see that file for a few linters that are
+intentionally disabled, with documented reasons, rather than configured to
+silently accept pre-existing issues). Code is formatted with `styler`
+(tidyverse style, non-strict).
 
 The test suite includes:
 

@@ -3,10 +3,10 @@
 ### Script authors: Yoram Kunkels, Stefan Knapen, & Ando Emerencia        ###
 ### Most recent Update: 16-04-2018                                        ###
 ### Supported devices: Actiwatch 2 Respironics & MW8                      ###
-###=======================================================================###
+### =======================================================================###
 ### Revision History:                                                     ###
 ### 16-04-2018: Added Actogram Functionality.                             ###
-###~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~###
+### ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~###
 
 #' ACTman - Actigraphy Manager
 #'
@@ -40,12 +40,12 @@
 #' @examples
 #' \dontrun{
 #' View(ACTman::ACTman(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part/mydata2",
-#'                     myACTdevice = "Actiwatch2",
-#'                     iwantsleepanalysis = FALSE,
-#'                     plotactogram = FALSE,
-#'                     selectperiod = FALSE,
-#'                     startperiod = "2016-10-03 00:00:00",
-#'                     daysperiod = 14, movingwindow = FALSE, circadian_analysis = TRUE))
+#'   myACTdevice = "Actiwatch2",
+#'   iwantsleepanalysis = FALSE,
+#'   plotactogram = FALSE,
+#'   selectperiod = FALSE,
+#'   startperiod = "2016-10-03 00:00:00",
+#'   daysperiod = 14, movingwindow = FALSE, circadian_analysis = TRUE))
 #' }
 #' @importFrom stats na.omit
 #' @importFrom utils View
@@ -57,7 +57,7 @@
 #' @export
 ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part/mydata",
                    sleepdatadir = paste("C:/Bibliotheek/Studie/PhD/Publishing/",
-                                        "ACTman/R-part/Actogram & Sleep analysis", sep = ""),
+                     "ACTman/R-part/Actogram & Sleep analysis", sep = ""),
                    myACTdevice = "Actiwatch2", iwantsleepanalysis = FALSE, plotactogram = FALSE,
                    selectperiod = FALSE, startperiod = NULL, daysperiod = FALSE, endperiod = NULL,
                    movingwindow = FALSE, movingwindow.size = 14, movingwindow.jump = 1,
@@ -65,20 +65,19 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
                    missings_report = TRUE, lengthcheck = TRUE, i_want_EWS = FALSE,
                    on_high_missings = c("continue", "abort"),
                    on_missing_markers = c("median", "manual", "abort")) {
-
   ## Consolidate parameter validation into a single config object (fails
   ## fast, before any file is processed), then unpack it back into local
   ## variables of the same names so the rest of this function is unchanged.
   ## See ?actman_config.
   config <- actman_config(workdir = workdir, sleepdatadir = sleepdatadir, myACTdevice = myACTdevice,
-                          iwantsleepanalysis = iwantsleepanalysis, plotactogram = plotactogram,
-                          selectperiod = selectperiod, startperiod = startperiod, daysperiod = daysperiod,
-                          endperiod = endperiod, movingwindow = movingwindow,
-                          movingwindow.size = movingwindow.size, movingwindow.jump = movingwindow.jump,
-                          circadian_analysis = circadian_analysis, nparACT_compare = nparACT_compare,
-                          na_omit = na_omit, na_impute = na_impute, missings_report = missings_report,
-                          lengthcheck = lengthcheck, i_want_EWS = i_want_EWS,
-                          on_high_missings = on_high_missings, on_missing_markers = on_missing_markers)
+    iwantsleepanalysis = iwantsleepanalysis, plotactogram = plotactogram,
+    selectperiod = selectperiod, startperiod = startperiod, daysperiod = daysperiod,
+    endperiod = endperiod, movingwindow = movingwindow,
+    movingwindow.size = movingwindow.size, movingwindow.jump = movingwindow.jump,
+    circadian_analysis = circadian_analysis, nparACT_compare = nparACT_compare,
+    na_omit = na_omit, na_impute = na_impute, missings_report = missings_report,
+    lengthcheck = lengthcheck, i_want_EWS = i_want_EWS,
+    on_high_missings = on_high_missings, on_missing_markers = on_missing_markers)
   myACTdevice <- config$myACTdevice
   on_high_missings <- config$on_high_missings
   on_missing_markers <- config$on_missing_markers
@@ -107,12 +106,12 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
   ## Initialise overview:
   ACTdata.overview <- data.frame("filename" = ACTdata.files, "start" = NA, "end" = NA, "end2" = NA,
-                                 "numberofobs" = NA, "numberofobs2" = NA, "recordingtime" = NA,
-                                 "recordingtime2" = NA, "summertime.start" = NA, "summertime.end" = NA, "missings" = NA,
-                                 "missings_perc" = NA, "IS" = NA, "IV" = NA, "RA" = NA, "L5" = NA, "L5_starttime" = NA, "M10" = NA,
-                                 "M10_starttime" = NA, "r2.IS" = NA, "r2.IV" = NA, "r2.RA" = NA, "r2.L5" = NA,
-                                 "r2.L5_starttime" = NA, "r2.M10" = NA, "r2.M10_starttime" = NA, "last5act.active" = NA,
-                                 "lengthcheck" = NA)
+    "numberofobs" = NA, "numberofobs2" = NA, "recordingtime" = NA,
+    "recordingtime2" = NA, "summertime.start" = NA, "summertime.end" = NA, "missings" = NA,
+    "missings_perc" = NA, "IS" = NA, "IV" = NA, "RA" = NA, "L5" = NA, "L5_starttime" = NA, "M10" = NA,
+    "M10_starttime" = NA, "r2.IS" = NA, "r2.IV" = NA, "r2.RA" = NA, "r2.L5" = NA,
+    "r2.L5_starttime" = NA, "r2.M10" = NA, "r2.M10_starttime" = NA, "last5act.active" = NA,
+    "lengthcheck" = NA)
 
   ## Initiate parameters:
   i <- 1 # set i
@@ -234,7 +233,9 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
 
     ## Check for empty first row and if so, remove it:
-    if (all(is.na(ACTdata.1.sub[1, ]))) { ACTdata.1.sub <- ACTdata.1.sub[-1, ] }
+    if (all(is.na(ACTdata.1.sub[1, ]))) {
+      ACTdata.1.sub <- ACTdata.1.sub[-1, ]
+    }
 
 
     ## Period Selection (user-defined option):
@@ -245,7 +246,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
       ## Then, if number of days from startperiod (daysperiod) is given, take only data from
       ## start (startperiod.loc) untill start + specified number of days (startperiod.loc + (daysperiod*minsaday)).
       if (daysperiod) {
-        ACTdata.1.sub <- ACTdata.1.sub[(startperiod.loc:(startperiod.loc + (daysperiod*minsaday))), ]
+        ACTdata.1.sub <- ACTdata.1.sub[(startperiod.loc:(startperiod.loc + (daysperiod * minsaday))), ]
         ## Else, if no daysperiod if given, see if user-defined end of period (endperiod) is given.
         ## If so, take only data from user-defined start of period to end of period.
       } else if (endperiod %in% ACTdata.1.sub$Date) {
@@ -277,7 +278,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
 
     ## Add 14 days in a way that respects daylight savings time changes:
-    #! Number of days needs to be made dynamic!! Needs to correspond to number of days in dataset!!
+    # ! Number of days needs to be made dynamic!! Needs to correspond to number of days in dataset!!
     ACTdata.1.sub.14day <- increase_by_days(ACTdata.1.sub$Date[1], 14)
 
 
@@ -289,7 +290,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
       if (ACTdata.1.sub[nrow(ACTdata.1.sub), "Date"] > ACTdata.1.sub.14day) {
         print("Warning: Dataset is longer than Start Date plus 14 full days!")
 
-        ACTdata.1.sub <- ACTdata.1.sub[1:((secs14day/60) + 1), ]
+        ACTdata.1.sub <- ACTdata.1.sub[1:((secs14day / 60) + 1), ]
 
         print("Action: Observations recorded after Start Date plus 14 full days were removed.")
         print("Task 2 DONE: Dataset shortened to Start Date plus 14 days. Tasks 3, 4, and 5 also OK")
@@ -321,16 +322,13 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     ## If user-defined argument "na_omit" is TRUE, then use na.omit{stats} to row-wise delete NA's:
     if (na_omit) {
       print("Row-wise removal of NA's as user defined na.omit = TRUE")
-      ACTdata.1.sub <- na.omit(ACTdata.1.sub) #! Creates error because many NA's!!!!
+      ACTdata.1.sub <- na.omit(ACTdata.1.sub) # ! Creates error because many NA's!!!!
       print("All NA's removed!")
     }
     ## If user-defined argument "na_impute" is TRUE, then use mice{mice} to impute missings through
     ## Multivariate Imputation by Chained Equations (MICE). This installs the 'mice' package and dependencies.
     if (na_impute) {
       ## Impute Missings
-      # if (!require('mice')) { install.packages('mice', dep = TRUE)}; library('mice')
-      # if (!require('pscl')) { install.packages('pscl', dep = TRUE)}; library('pscl')
-      # if (!require('accelmissing')) { install.packages('accelmissing', dep = TRUE)}; library('accelmissing')
       tempData <- mice::mice(matrix(data = c(ACTdata.1.sub$Activity, rep.int(x = 0, times = (ACTdata.overview[i, "numberofobs"]))), ncol = 2), m = 5, maxit = 50, meth = "pmm", seed = 500)
       tempData2 <- mice::complete(tempData, 1)
       ACTdata.1.sub$Activity <- tempData2$V1
@@ -338,7 +336,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
     ## User-control over Analysis if too much Missings:
     ## Too much is specified in this case as > 0.01% missing of total dataset.
-    #! This 0.01% is arbitrarily chosen, as of now no suitable validated criterion is yet found.
+    # ! This 0.01% is arbitrarily chosen, as of now no suitable validated criterion is yet found.
     ## Initialise exception handling for when there are no missings:
     number_of_missings <- ifelse(is.na(ACTdata.overview[i, "missings"]), 0, ACTdata.overview[i, "missings"])
     ## If a missings-prompt is required (default is missings_report = TRUE), ..
@@ -359,15 +357,11 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     }
 
 
-    # ## Set NA to 0
-    # #! Debug and/or possible future functionality if required
-
-
     ## Check if there is activity in the tail of the dataset. As sometimes at the end of the study
     ## the actigraph is handed over by the participant, but not immediately stopped.
     ## If Activity in Last 5 observations is on average zero, Skip to Last Activity:
     ACTdata.1.sub.last5act <- ACTdata.1.sub$Activity[(nrow(ACTdata.1.sub) - 4):nrow(ACTdata.1.sub)] # Last 5 activity counts in dataset
-    ACTdata.1.sub.last5act.active <- sum(ACTdata.1.sub.last5act, na.rm = T) >= (5 * length(ACTdata.1.sub.last5act)) # Is there on average more than 5 counts per obs?
+    ACTdata.1.sub.last5act.active <- sum(ACTdata.1.sub.last5act, na.rm = TRUE) >= (5 * length(ACTdata.1.sub.last5act)) # Is there on average more than 5 counts per obs?
     print("Task: Checking for Activity in Last 5 observations")
     if (ACTdata.1.sub.last5act.active == FALSE) {
       print("Warning: No Activity in Last 5 observations!")
@@ -401,7 +395,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     newdir <- file.path(paths$managed_dir, name)
     ensure_dir(newdir)
     ## Write managed data:
-    ACTdata.1.sub$Date = format(ACTdata.1.sub$Date, "%Y-%m-%d %H:%M:%S")
+    ACTdata.1.sub$Date <- format(ACTdata.1.sub$Date, "%Y-%m-%d %H:%M:%S")
     write.table(ACTdata.1.sub, quote = FALSE, row.names = FALSE,
       col.names = FALSE, file = file.path(newdir, paste(gsub(pattern = ".csv",
         replacement = "", x = ACTdata.files[i]), "MANAGED.txt")))
@@ -411,7 +405,7 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
     ## Read managed dataset for analyses and functionalities:
     CRV.data <- read.table(file = file.path(newdir, paste(gsub(pattern = ".csv", replacement = "", x = ACTdata.files[i]), "MANAGED.txt")),
-                           stringsAsFactors = FALSE)
+      stringsAsFactors = FALSE)
     colnames(CRV.data) <- c("Date", "Time", "Activity")
 
 
@@ -419,15 +413,15 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     rollingwindow.results <- NA
     ## Moving/Rolling Window
     ## Check first if Moving Window is required, as this requires it's own analysis calls.
-    #! Add Sleep-analysis for Rolling Window!
-    #! Add possibility to change 'jump-length' of rolling window (now 1 day) to multiple days!
+    # ! Add Sleep-analysis for Rolling Window!
+    # ! Add possibility to change 'jump-length' of rolling window (now 1 day) to multiple days!
     if (movingwindow) {
       ## Assign results from rolling window (see ?run_rolling_window):
       rollingwindow.results <- run_rolling_window(x = CRV.data,
-                                                  window = (1440 * (movingwindow.size)),
-                                                  jump = (1440 * (movingwindow.jump)),
-                                                  myACTdevice = myACTdevice,
-                                                  ACTdata.1.sub = ACTdata.1.sub)
+        window = (1440 * (movingwindow.size)),
+        jump = (1440 * (movingwindow.jump)),
+        myACTdevice = myACTdevice,
+        ACTdata.1.sub = ACTdata.1.sub)
 
       ## Initialise normal circadian rhythm analysis without moving window:
     } else {
@@ -449,9 +443,8 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     }
     ## If a comparison with another actigraphy R package is required, run nparACT_base_loop{nparACT}:
     if (nparACT_compare) {
-
       ## Use nparACT Package to calculate circadian rhythm variables:
-      r <- nparACT::nparACT_base_loop(path = newdir, SR = 1/60, fulldays = T, plot = T)
+      r <- nparACT::nparACT_base_loop(path = newdir, SR = 1 / 60, fulldays = TRUE, plot = TRUE)
 
       ## Attach nparACT output to overview
       ACTdata.overview[i, "IS"] <- r$IS
@@ -468,9 +461,9 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
 
     if (movingwindow) {
       write.table(rollingwindow.results,
-                  file = file.path(paths$results_dir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-                               "-rollingwindow-results.csv", sep = "")),
-                  row.names = F, sep = ",")
+        file = file.path(paths$results_dir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
+          "-rollingwindow-results.csv", sep = "")),
+        row.names = FALSE, sep = ",")
     }
 
 
@@ -485,21 +478,21 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
     ## Use the plot_actogram{ACTman} function to plot an Actogram of the whole period.
     if (plotactogram != FALSE) {
       plot_actogram(workdir = workdir, ACTdata.1.sub = ACTdata.1.sub, i = i, plotactogram = plotactogram,
-                    rollingwindow.results = rollingwindow.results, i_want_EWS = i_want_EWS)
+        rollingwindow.results = rollingwindow.results, i_want_EWS = i_want_EWS)
     }
 
 
     ## Report progress in console:
     print(paste("--------------------------------------", "END OF DATASET", i, "---", "@",
-                round(i * (100 / length(ACTdata.files))), "% DONE",  "--------------------------------------"))
+      round(i * (100 / length(ACTdata.files))), "% DONE",  "--------------------------------------"))
   }
 
 
   ## Step 3: After loop processing-----------------------------------------------------------------
 
   ## Transform negative recordingtimes to positive:
-  ACTdata.overview$recordingtime <- ((ACTdata.overview$recordingtime) ^ 2) ^ (1 / 2)
-  ACTdata.overview$recordingtime2 <- ((ACTdata.overview$recordingtime2) ^ 2) ^ (1 / 2)
+  ACTdata.overview$recordingtime <- ((ACTdata.overview$recordingtime)^2)^(1 / 2)
+  ACTdata.overview$recordingtime2 <- ((ACTdata.overview$recordingtime2)^2)^(1 / 2)
 
   ## Assign zero to missings column in overview when there are no missings:
   ACTdata.overview[is.na(ACTdata.overview[, "missings"]), "missings"] <- 0
@@ -524,11 +517,11 @@ ACTman <- function(workdir = "C:/Bibliotheek/Studie/PhD/Publishing/ACTman/R-part
   ensure_dir(paths$results_dir)
 
   if (circadian_analysis) {
-    write.table(ACTdata.1.sub.expvars, file = file.path(paths$results_dir, "ACTdata_circadian_res.csv"), sep = ",", row.names = F)
+    write.table(ACTdata.1.sub.expvars, file = file.path(paths$results_dir, "ACTdata_circadian_res.csv"), sep = ",", row.names = FALSE)
   }
 
   ## Write ACTdata.overview to .CSV
-  write.table(ACTdata.overview, file = file.path(paths$results_dir, "ACTdata_overview.csv"), sep = ",", row.names = F)
+  write.table(ACTdata.overview, file = file.path(paths$results_dir, "ACTdata_overview.csv"), sep = ",", row.names = FALSE)
 
 
   ## Returned result.

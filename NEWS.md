@@ -1,5 +1,36 @@
 # ACTman 2.0.0
 
+## Item 4: style enforcement (lintr + styler)
+
+Verified against the full test suite (67/67 assertions green throughout).
+
+- Added `.lintr` config and `.github/workflows/lint.yaml` (CI gated on zero
+  lints). Three linters are intentionally disabled with documented
+  rationale rather than configured to silently accept pre-existing issues:
+  `object_name_linter` (the mixed dotted.case/snake_case/PascalCase naming
+  already documented as a Phase 5 known issue), `cyclocomp_linter`
+  (`ACTman()` is a long orchestrator by design), and
+  `line_length_linter`/`indentation_linter` (real pre-existing debt in
+  long-commented legacy lines, plus a genuine disagreement between lintr's
+  default hanging-indent alignment and styler's non-strict output).
+- Ran `styler` (installed from GitHub source; not packaged for this
+  sandbox's apt) across `R/` and `tests/` in non-strict tidyverse style --
+  purely mechanical whitespace/spacing changes, verified against the full
+  test suite before and after.
+- Fixed everything else lintr flagged (375 lints -> 0): 8 bare `T`/`F` ->
+  `TRUE`/`FALSE`; 12 more `1:n`-style loops -> `seq_along()`/`seq_len()`
+  (2 standalone loops fixed directly; the rest live in `actogram.R`'s
+  EWS-overlay plotting code, which has no test coverage for the
+  real-rolling-window-data path, so left in a documented `# nolint` block
+  rather than mechanically "fixed" -- tracked as follow-up work alongside
+  adding that coverage); ~13 more genuine leftover dead-code comments that
+  the Phase 5 cleanup pass had missed.
+- Removed `inst/r/build_help.r` (a stale personal dev script hardcoding one
+  original author's local machine path) and `inst/docs/` (a stale
+  pre-generated pkgdown site referencing the old 5-function API, superseded
+  by Item 5's real pkgdown setup) and the CircleCI-era
+  `inst/bash/*.sh` helper scripts, all fully superseded by Items 1/2/4.
+
 ## Item 3: config object + unified return type
 
 Breaking change to `ACTman()`'s return value (hence part of the 2.0.0

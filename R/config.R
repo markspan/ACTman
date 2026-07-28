@@ -33,7 +33,6 @@ actman_config <- function(workdir, sleepdatadir = workdir, myACTdevice = "Actiwa
                           missings_report = TRUE, lengthcheck = TRUE, i_want_EWS = FALSE,
                           on_high_missings = c("continue", "abort"),
                           on_missing_markers = c("median", "manual", "abort")) {
-
   ## Validate the non-interactive decision parameters and device name up
   ## front (fail fast, rather than partway through a long-running batch
   ## job, or -- for myACTdevice -- on the very last file after already

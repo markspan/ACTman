@@ -28,9 +28,9 @@ time_str <- format(times, "%H:%M:%S")
 aw2_dir <- "actiwatch2_sample"
 dir.create(aw2_dir, showWarnings = FALSE)
 data_rows <- data.frame(V1 = seq_len(n_min), V2 = "Epoch", V3 = "",
-                        V4 = date_str, V5 = time_str, V6 = activity)
+  V4 = date_str, V5 = time_str, V6 = activity)
 write.table(data_rows, file.path(aw2_dir, "P01.csv"), sep = ",",
-            row.names = FALSE, col.names = FALSE, quote = FALSE, na = "NA")
+  row.names = FALSE, col.names = FALSE, quote = FALSE, na = "NA")
 
 ## --- MW8 fixture ----------------------------------------------------------
 ## Device export: metadata lines, a literal "Raw data:" marker, one header

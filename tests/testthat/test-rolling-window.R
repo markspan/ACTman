@@ -10,13 +10,13 @@ test_that("run_rolling_window produces one row per window with expected columns"
   minute_of_day <- as.numeric(format(times, "%H")) * 60 + as.numeric(format(times, "%M"))
   pattern <- 50 + 40 * sin((minute_of_day - 6 * 60) / 1440 * 2 * pi)
   crv <- data.frame(Date = format(times, "%Y-%m-%d"), Time = format(times, "%H:%M:%S"),
-                    Activity = round(pattern), stringsAsFactors = FALSE)
+    Activity = round(pattern), stringsAsFactors = FALSE)
   actdata <- data.frame(Date = paste(crv$Date, crv$Time), Activity = crv$Activity,
-                        stringsAsFactors = FALSE)
+    stringsAsFactors = FALSE)
 
   result <- expect_no_error(
     run_rolling_window(x = crv, window = 2 * 1440, jump = 1440,
-                       myACTdevice = "Actiwatch2", ACTdata.1.sub = actdata, verbose = FALSE)
+      myACTdevice = "Actiwatch2", ACTdata.1.sub = actdata, verbose = FALSE)
   )
 
   expect_s3_class(result, "data.frame")

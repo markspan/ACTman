@@ -37,7 +37,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
   ## Read sleeplog
   if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) == 0 &&
-     length(list.files(paths$workdir, pattern = "markers.csv")) == 0) { # Sanity Check
+    length(list.files(paths$workdir, pattern = "markers.csv")) == 0) { # Sanity Check
     message("No sleeplog or Event marker file found in working directory!")
     message("Please provide sleeplog or Event marker file!")
     message("Also please make sure that the name of the sleeplog file ends in 'sleeplog.csv'!")
@@ -49,7 +49,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
   # When only sleeplog found
   if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) >= 1 &&
-     length(list.files(paths$workdir, pattern = "markers.csv")) == 0) { # Check for Marker file
+    length(list.files(paths$workdir, pattern = "markers.csv")) == 0) { # Check for Marker file
     message("Sleeplog file found in working directory!")
 
     sleeplog_file <- list.files(paths$workdir, pattern = "sleeplog.csv")[i]
@@ -60,7 +60,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
 
   if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) == 0 &&
-     length(list.files(paths$workdir, pattern = "markers.csv")) == 1) { # Check for Marker file
+    length(list.files(paths$workdir, pattern = "markers.csv")) == 1) { # Check for Marker file
     message("Only Event marker file found in working directory!")
     message("Generating sleeplog from marker file!")
 
@@ -69,7 +69,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
 
   if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) == 0 &&
-     length(list.files(paths$workdir, pattern = "markers.csv")) > 1) { # Check for Marker file
+    length(list.files(paths$workdir, pattern = "markers.csv")) > 1) { # Check for Marker file
     message("Multiple marker files found in working directory!")
     message("Generating sleeplog from marker file!")
   }
@@ -77,16 +77,16 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
 
   if (length(list.files(paths$workdir, pattern = "sleeplog.csv")) != 0 &&
-     length(list.files(paths$workdir, pattern = "markers.csv")) != 0) { # Check for Marker file
+    length(list.files(paths$workdir, pattern = "markers.csv")) != 0) { # Check for Marker file
     message("Both marker file AND Sleeplog found in working directory!")
 
     message("Checking for person-specific markers and/or sleeplog!")
 
     which_ppns_markers <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-                                                      list.files(paths$workdir, pattern = "markers.csv")) # markers of this ppn
+      list.files(paths$workdir, pattern = "markers.csv")) # markers of this ppn
 
     which_ppns_sleeplog <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-                                 list.files(paths$workdir, pattern = "sleeplog.csv")) #sleeplog of this ppn
+      list.files(paths$workdir, pattern = "sleeplog.csv")) # sleeplog of this ppn
 
 
     ## If there is a sleeplog AND this sleeplog belongs to this ppn
@@ -99,7 +99,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
       sleeplog_from_markers(workdir = paths$workdir, i = i, ACTdata.files = ACTdata.files, on_missing_markers = on_missing_markers)
 
       which_ppns_sleeplog <- pmatch((paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 8)))),
-                                    list.files(paths$workdir, pattern = "sleeplog.csv")) #sleeplog of this ppn
+        list.files(paths$workdir, pattern = "sleeplog.csv")) # sleeplog of this ppn
 
       sleeplog_file <- list.files(paths$workdir, pattern = "sleeplog.csv")[which_ppns_sleeplog]
       data.sleeplog <- read.csv(file = file.path(paths$workdir, sleeplog_file))
@@ -125,7 +125,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
 
   ## Initialise Output Overview
   sleepdata.overview <- data.frame("date" = NA, "sleep.start" = NA, "sleep.end" = NA,
-                                   "sleep.efficiency" = NA, "sleep.latency" = NA)
+    "sleep.efficiency" = NA, "sleep.latency" = NA)
 
   ## END OF Step 1: Basic Operations.
 
@@ -135,7 +135,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
     loop_steps <- 14
     if (nrow(data.sleeplog) < 14) {
       print("ERROR: we need at least 14 days of sleeplog. Terminating program.")
-      stop('ERROR: we need at least 14 days of sleeplog. Terminating program.')
+      stop("ERROR: we need at least 14 days of sleeplog. Terminating program.")
     }
   } else {
     loop_steps <- nrow(data.sleeplog)
@@ -331,7 +331,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
     ActualSleepPerc <- (ActualSleep / AssumedSleep) * 100 # Actual sleep time expressed as a percentage of the assumed sleep time
     ActualWakeTime <- WakeEpochs / 60 # Total time spent in wake according to the epoch-by-epoch wake/sleep scores.
     ActualWakePerc <- 100 - ActualSleepPerc # Actual sleep time expressed as a percentage of the assumed sleep time.
-    SleepEfficiency <- (ActualSleep/TimeInBed) * 100 # Actual sleep time expressed as a percentage of time in bed.
+    SleepEfficiency <- (ActualSleep / TimeInBed) * 100 # Actual sleep time expressed as a percentage of time in bed.
     SleepLatency <- (rownr.sleep.start - rownr.Bedtime) / 60 # The time between "Lights Out" and "Fell Asleep"
 
     ## Planned but not yet implemented metrics (would need bout-detection
@@ -365,7 +365,7 @@ sleepdata_overview <- function(workdir, actdata, i, lengthcheck, ACTdata.files,
   ## Write sleepdata output as .CSV into "Results" directory:
   ensure_dir(paths$results_dir)
   write.csv(sleepdata.overview, file = file.path(paths$results_dir, paste(substr(ACTdata.files[i], 1, (nchar(ACTdata.files[i]) - 4)),
-                                             "-sleep-results.csv", sep = "")))
+    "-sleep-results.csv", sep = "")))
 
   # Return a result
   sleepdata.overview
