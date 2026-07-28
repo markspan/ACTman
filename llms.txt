@@ -280,12 +280,13 @@ are a set of statistics originally developed for anticipating critical
 transitions in complex dynamical systems – rising variance and
 autocorrelation, and slower “recovery” from perturbation, can precede a
 qualitative shift in system state. They have been explored as potential
-early indicators of mood-state transitions from actigraphy and other
-time series, though Helmich et al. (2024) provide a critical perspective
-on this literature, arguing that current empirical and theoretical
-support for using these signals to predict mental health symptom changes
-is limited – worth keeping in mind when interpreting the statistics
-below:
+early indicators of mood-state transitions from actigraphy data
+specifically (Kunkels et al., 2021, in bipolar disorder; Kunkels et al.,
+2023, during antidepressant discontinuation), though Helmich et
+al. (2024) provide a critical perspective on this broader literature,
+arguing that current empirical and theoretical support for using these
+signals to predict mental health symptom changes is limited – worth
+keeping in mind when interpreting the statistics below:
 
 - `Mean`, `Variance`, `SD`, `CoV` (coefficient of variation, %)
 - `Skewness`, `Kurtosis`
@@ -656,6 +657,18 @@ Kunkels, Y. K., Knapen, S. E., Zuidersma, M., Wichers, M., Riese, H., &
 Emerencia, A. C. (2020). ACTman: Automated preprocessing and analysis of
 actigraphy data. *Journal of Science and Medicine in Sport*, 23(5),
 481-486.
+
+Kunkels, Y. K., Riese, H., Knapen, S. E., Riemersma-van der Lek, R. F.,
+George, S. V., van Roon, A. M., Schoevers, R. A., & Wichers, M. (2021).
+Efficacy of early warning signals and spectral periodicity for
+predicting transitions in bipolar patients: an actigraphy study.
+*Translational Psychiatry*, 11, 350.
+
+Kunkels, Y. K., Smit, A. C., Minaeva, O., Snippe, E., George, S. V., van
+Roon, A. M., Wichers, M., & Riese, H. (2023). Risk ahead:
+actigraphy-based early-warning signals of increases in depressive
+symptoms during antidepressant discontinuation. *Clinical Psychological
+Science*, 11(5), 942-953.
 
 Van Someren, E. J. W., Swaab, D. F., Colenda, C. C., Cohen, W., McCall,
 W. V., & Rosenquist, P. B. (1999). Bright light therapy: improved

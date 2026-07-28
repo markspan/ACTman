@@ -2,6 +2,29 @@
 
 ## ACTman 2.0.0
 
+### Add two applied actigraphy-EWS references
+
+Added two citations to
+[`ews_metrics()`](https://markspan.github.io/ACTman/reference/ews_metrics.md)’s
+docstring, README, and the vignette, alongside the existing Helmich et
+al. (2024) critical perspective:
+
+- Kunkels, Y. K., Riese, H., Knapen, S. E., Riemersma-van der Lek, R.
+  F., George, S. V., van Roon, A. M., Schoevers, R. A., & Wichers, M.
+  (2021). Efficacy of early warning signals and spectral periodicity for
+  predicting transitions in bipolar patients: an actigraphy study.
+  *Translational Psychiatry*, 11, 350.
+- Kunkels, Y. K., Smit, A. C., Minaeva, O., Snippe, E., George, S. V.,
+  van Roon, A. M., Wichers, M., & Riese, H. (2023). Risk ahead:
+  actigraphy-based early-warning signals of increases in depressive
+  symptoms during antidepressant discontinuation. *Clinical
+  Psychological Science*, 11(5), 942-953.
+
+Both are applied actigraphy-EWS studies by Yoram Kunkels (ACTman’s
+original author), complementing Helmich et al.’s more skeptical framing
+with concrete examples of the method actually being applied in this
+package’s own domain.
+
 ### Fix R CMD check failures on CI (newer R version)
 
 The `R-CMD-check` workflow failed on macOS with R 4.6.1 (passed locally

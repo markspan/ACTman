@@ -226,7 +226,7 @@ Someren et al., 1999; Witting et al., 1990).</p>
 <span></span>
 <span><span class="va">actogram_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">workdir</span>, <span class="st">"Actograms"</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">"\\.pdf$"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">actogram_file</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpaU9v4R/actman-vignette-1b6a54280e6c/Actograms/Actigraphy Data - 24h Plot 1 .pdf"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpJOmMVb/actman-vignette-1adb74ebd793/Actograms/Actigraphy Data - 24h Plot 1 .pdf"</span></span></code></pre></div>
 <p><code><a href="../reference/plot_actogram.html">plot_actogram()</a></code> writes a PDF (24h or 48h) to
 <code>workdir/Actograms</code>; open Actigraphy Data - 24h Plot 1 .pdf
 to see it (PDFs can’t be embedded inline in this vignette, but see the
@@ -428,9 +428,9 @@ window stepped by 1 day:</p>
 variables as before, now tracked across the recording, alongside
 early-warning-signal statistics (<code>Mean</code>, <code>SD</code>,
 autocorrelation, etc. – see <code><a href="../reference/ews_metrics.html">?ews_metrics</a></code>) that have been
-explored as potential indicators of mood-state transitions in longer
-recordings, though see Helmich et al. (2024) for a critical perspective
-on the current evidence for this use.</p>
+explored as potential indicators of mood-state transitions in actigraphy
+data (Kunkels et al., 2021, 2023), though see Helmich et al. (2024) for
+a critical perspective on the current evidence for this use.</p>
 </div>
 <div class="section level2">
 <h2 id="sleep-analysis">Sleep analysis<a class="anchor" aria-label="anchor" href="#sleep-analysis"></a>
