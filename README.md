@@ -541,6 +541,9 @@ Emerencia, A. C. (2020). ACTman: Automated preprocessing and analysis of
 actigraphy data. *Journal of Science and Medicine in Sport*, 23(5), 481-486.
 https://doi.org/10.1016/j.jsams.2019.11.009
 
+Read the paper: [publisher's version (DOI)](https://doi.org/10.1016/j.jsams.2019.11.009)
+| [open-access copy via University of Groningen (Pure)](https://pure.rug.nl/ws/files/123896013/1_s2.0_S1440244019302877_main.pdf)
+
 ## References
 
 CamNtech (2013). Information Bulletin No. 3: Sleep Analysis Algorithms.
