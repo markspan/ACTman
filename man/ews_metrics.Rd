@@ -34,8 +34,10 @@ precede a critical transition -- rising variance, rising autocorrelation,
 and slower recovery from perturbation ("critical slowing down") are
 classic examples. They have been explored as possible early indicators of
 impending state transitions in mood or health (e.g. an approaching
-depressive episode); Helmich et al. (2024) provide a critical
-perspective on this literature, arguing that current empirical and
+depressive episode) using actigraphy data specifically (Kunkels et al.,
+2021, in bipolar disorder; Kunkels et al., 2023, during antidepressant
+discontinuation). Helmich et al. (2024) provide a critical perspective
+on this broader literature, arguing that current empirical and
 theoretical support for using early-warning-signal-based critical
 slowing down to predict changes in mental health symptoms is limited,
 and that these limitations should be kept in mind when interpreting the
@@ -46,4 +48,16 @@ Helmich, M. A., Schreuder, M. J., Bringmann, L. F., Riese, H., Snippe,
 E., & Smit, A. C. (2024). Slow down and be critical before using early
 warning signals in psychopathology. \emph{Nature Reviews Psychology},
 3, 767-780.
+
+Kunkels, Y. K., Riese, H., Knapen, S. E., Riemersma-van der Lek, R. F.,
+George, S. V., van Roon, A. M., Schoevers, R. A., & Wichers, M. (2021).
+Efficacy of early warning signals and spectral periodicity for
+predicting transitions in bipolar patients: an actigraphy study.
+\emph{Translational Psychiatry}, 11, 350.
+
+Kunkels, Y. K., Smit, A. C., Minaeva, O., Snippe, E., George, S. V., van
+Roon, A. M., Wichers, M., & Riese, H. (2023). Risk ahead:
+actigraphy-based early-warning signals of increases in depressive
+symptoms during antidepressant discontinuation. \emph{Clinical
+Psychological Science}, 11(5), 942-953.
 }
